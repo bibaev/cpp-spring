@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <cassert>
 
+#include "alpha_iterator.h"
+
 template<typename T>
 void print(T begin, T end) {
 	while (begin != end) {
@@ -84,9 +86,17 @@ void is_palindrome_tests() {
 	assert(!is_palindrome(str2.cbegin(), str2.cend()));
 }
 
+void alpha_iterator_tests() {
+	std::string str = "34234d345456s456456456q";
+	auto it = make_alpha_iterator(str.begin(), str.end());
+	auto end = make_alpha_iterator(str.end());
+	print(it, end);
+}
+
 int main() {
 	print_tests();
 	tree_sort_tests();
 	remove_duplicates_tests();
 	is_palindrome_tests();
+	alpha_iterator_tests();
 }
