@@ -71,11 +71,17 @@ void remove_duplicates_tests()
 }
 
 template<typename T>
-bool is_palindrome(T begin, T end)
+bool is_palindrome(T const begin, T const end)
 {
 	auto reverse = std::reverse_iterator<T>(end);
-	
-	// TODO: complete it.
+	auto it = begin;
+	while (it != end)
+	{
+		if (*it != *reverse)
+			return false;
+		++it;
+		++reverse;
+	}
 
 	return true;
 }
