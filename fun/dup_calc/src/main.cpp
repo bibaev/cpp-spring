@@ -16,7 +16,7 @@ void usage() {
 	std::cout << "Usage: ./dup_calc <dir_name>" << std::endl;
 }
 
-void recoursiveFindFiles(fs::path const & path, files_map & files) {
+void recoursive_find_files(fs::path const & path, files_map & files) {
 	for (auto const & p : fs::recursive_directory_iterator(path)) {
 		if (fs::is_regular_file(p)) {
 			files[fs::file_size(p)].push_back(p);
@@ -24,34 +24,34 @@ void recoursiveFindFiles(fs::path const & path, files_map & files) {
 	}
 }
 
-void evaluateHash(fs::path const & path, uint8_t md5digest[MD5_DIGEST_LENGTH]){
-	MD5_CTX md5handler;
+void evaluate_hash(fs::path const & path, uint8_t md5digest[MD5_DIGEST_LENGTH]){
+	MD5_CTX md5_handler;
 	uint8_t buffer[BUFFER_SIZE];
-	MD5_Init(&md5handler);
+	MD5_Init(&md5_handler);
 	std::ifstream is(path, std::ifstream::binary);
 	while (!is.eof()) {
 		is.read((char*)buffer, BUFFER_SIZE);
 		size_t readed = is.gcount();
-		MD5_Update(&md5handler, buffer, readed);
+		MD5_Update(&md5_handler, buffer, readed);
 	}
 
-	MD5_Final(md5digest, &md5handler);
+	MD5_Final(md5digest, &md5_handler);
 }
 
 std::map<std::string, std::vector<fs::path>> findDups(std::vector<fs::path> pathes) {
-	std::map<std::string, std::vector<fs::path>> hashFilesMap;
+	std::map<std::string, std::vector<fs::path>> hash_files_map;
 	uint8_t md5digest[MD5_DIGEST_LENGTH];
 	
 	for (auto const & filePath : pathes) {
-		evaluateHash(filePath, md5digest);
+		evaluate_hash(filePath, md5digest);
 		std::string hash(reinterpret_cast<const char *>(md5digest), MD5_DIGEST_LENGTH);
-		hashFilesMap[hash].push_back(filePath);
+		hash_files_map[hash].push_back(filePath);
 	}
 
-	return hashFilesMap;
+	return hash_files_map;
 }
 
-std::string getSize(double size){
+std::string get_pretty_size(double size){
 	std::stringstream sstream;
 	sstream << std::fixed << std::setprecision(1);
 	if (size < 1024)
@@ -65,8 +65,8 @@ std::string getSize(double size){
 	return sstream.str();
 }
 
-void printFilesGroup(std::vector<fs::path> const & pathes, size_t fileSize, size_t groupNum) {
-	std::cout << "#" << groupNum << " " << getSize(fileSize) << std::endl;
+void print_files_group(std::vector<fs::path> const & pathes, size_t file_size, size_t group_num) {
+	std::cout << "#" << group_num << " " << get_pretty_size(file_size) << std::endl;
 	for (auto const & path : pathes) {
 		std::cout << path.string() << std::endl;
 	}
@@ -80,22 +80,22 @@ int main(int argc, char * argv[]) {
 		return 1;
 	}
 
-	files_map sizeFilenamesMapping;
-	recoursiveFindFiles(argv[1], sizeFilenamesMapping);
+	files_map size_filenames_mapping;
+	recoursive_find_files(argv[1], size_filenames_mapping);
 
-	size_t groupNum = 1;
-	uint64_t totalSize = 0;
-	for (auto const & sizeFilesPair : sizeFilenamesMapping) {
-		if (sizeFilesPair.second.size() < 2) continue;
-		auto hashFilesMap = findDups(sizeFilesPair.second);
-		for (auto const & hashFilesPair : hashFilesMap) {
-			if (hashFilesPair.second.size() > 1) {
-				printFilesGroup(hashFilesPair.second, sizeFilesPair.first, groupNum++);
-				totalSize += sizeFilesPair.first * (hashFilesPair.second.size() - 1);
+	size_t group_num = 1;
+	uint64_t total_size = 0;
+	for (auto const & size_files_pair : size_filenames_mapping) {
+		if (size_files_pair.second.size() < 2) continue;
+		auto hash_files_map = findDups(size_files_pair.second);
+		for (auto const & hash_files_pair : hash_files_map) {
+			if (hash_files_pair.second.size() > 1) {
+				print_files_group(hash_files_pair.second, size_files_pair.first, group_num++);
+				total_size += size_files_pair.first * (hash_files_pair.second.size() - 1);
 			}
 		}
 	}
 
-	std::cout << getSize(totalSize) << " wasted in total." << std::endl;
+	std::cout << get_pretty_size(total_size) << " wasted in total." << std::endl;
 	return 0;
 }
