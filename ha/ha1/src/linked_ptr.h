@@ -11,16 +11,18 @@ namespace smart_ptr {
         class node {
         public:
             node();
+            node(node & other) = delete;
+            node& operator=(node const& other) = delete;
+            ~node();
 
             bool unique() const;
             void insert_after_this(node & other);
             void extract();
             void swap(node & other);
-            ~node();
         private:
             node * left_;
             node * right_;
-        };
+        }; // node
 
     public:
         linked_ptr();
@@ -54,7 +56,7 @@ namespace smart_ptr {
     private:
         mutable node node_;
         T* ptr_;
-    };
+    }; // linked_ptr
 
     template <typename T>
     linked_ptr<T>::node::node()
