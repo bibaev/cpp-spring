@@ -15,7 +15,7 @@ namespace smart_ptr {
             bool unique() const;
             void insert_after_this(node & other);
             void extract();
-
+            void swap(node & other);
             ~node();
         private:
             node * left_;
@@ -82,6 +82,24 @@ namespace smart_ptr {
         right_->left_ = left_;
 
         left_ = right_ = this;
+    }
+
+    template <typename T>
+    void linked_ptr<T>::node::swap(node& other) {
+        left_->right_ = &other;
+        right_->left_ = &other;
+
+        other.right_->left_ = this;
+        other.left_->right_ = this;
+
+        auto other_left = other.left_;
+        auto other_right = other.right_;
+
+        other.left_ = left_ == this ? &other : left_;
+        other.right_ = right_ == this ? &other : right_;
+
+        left_ = other_left == &other ? this : other_left;
+        right_ = other_right == &other ? this : other_right;
     }
 
     template <typename T>
@@ -176,11 +194,7 @@ namespace smart_ptr {
     void linked_ptr<T>::swap(linked_ptr& other) {
         std::swap(ptr_, other.ptr_);
 
-        node_.insert_after_this(other.node_);
-        other.node_.insert_after_this(node_);
-
-        node_.extract();
-        other.node_.extract();
+        node_.swap(other.node_);
     }
 
     template <typename T>
