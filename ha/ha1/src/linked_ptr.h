@@ -1,5 +1,7 @@
 #ifndef LINKED_PTR_h
 #define LINKED_PTR_h
+#include <cstddef>
+#include <memory>
 
 namespace smart_ptr {
 
@@ -11,8 +13,10 @@ namespace smart_ptr {
             node();
 
             bool unique() const;
-            void insert_after(node & other);
+            void insert_after_this(node & other);
             void extract();
+
+            ~node();
         private:
             node * left_;
             node * right_;
@@ -64,14 +68,12 @@ namespace smart_ptr {
     }
 
     template <typename T>
-    void linked_ptr<T>::node::insert_after(node& other) {
+    void linked_ptr<T>::node::insert_after_this(node& other) {
         other.right_ = right_;
         other.left_ = this;
 
-        left_ = &other;
-        if(right_ == this) {
-            right_ = left_;
-        }
+        right_->left_ = &other;
+        right_ = &other;
     }
 
     template <typename T>
@@ -80,6 +82,11 @@ namespace smart_ptr {
         right_->left_ = left_;
 
         left_ = right_ = this;
+    }
+
+    template <typename T>
+    linked_ptr<T>::node::~node() {
+        extract();
     }
 
     template <typename T>
@@ -98,7 +105,7 @@ namespace smart_ptr {
     linked_ptr<T>::linked_ptr(linked_ptr const& other)
         : node_()
         , ptr_(other.get()) {
-        other.node_.insert_after(node_);
+        other.node_.insert_after_this(node_);
     }
 
     template <typename T>
@@ -116,7 +123,7 @@ namespace smart_ptr {
     linked_ptr<T>::~linked_ptr() {
         void(sizeof(T));
 
-        if (node_.unique()) {
+        if (unique()) {
             delete ptr_;
         }
     }
@@ -169,8 +176,8 @@ namespace smart_ptr {
     void linked_ptr<T>::swap(linked_ptr& other) {
         std::swap(ptr_, other.ptr_);
 
-        node_.insert_after(other.node_);
-        other.node_.insert_after(node_);
+        node_.insert_after_this(other.node_);
+        other.node_.insert_after_this(node_);
 
         node_.extract();
         other.node_.extract();

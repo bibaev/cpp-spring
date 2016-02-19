@@ -1,6 +1,7 @@
+#include "linked_ptr.h"
 #include <iostream>
 #include <cassert>
-#include "linked_ptr.h"
+
 
 using namespace smart_ptr;
 
