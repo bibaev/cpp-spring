@@ -86,17 +86,20 @@ namespace smart_ptr {
 
     template <typename T>
     void linked_ptr<T>::node::swap(node& other) {
-        left_->right_ = &other;
-        right_->left_ = &other;
-
-        other.right_->left_ = this;
-        other.left_->right_ = this;
+        auto left = left_;
+        auto right = right_;
 
         auto other_left = other.left_;
         auto other_right = other.right_;
 
-        other.left_ = left_ == this ? &other : left_;
-        other.right_ = right_ == this ? &other : right_;
+        left->right_ = &other;
+        right->left_ = &other;
+
+        other_right->left_ = this;
+        other_left->right_ = this;
+
+        other.left_ = left == this ? &other : left;
+        other.right_ = right == this ? &other : right;
 
         left_ = other_left == &other ? this : other_left;
         right_ = other_right == &other ? this : other_right;
