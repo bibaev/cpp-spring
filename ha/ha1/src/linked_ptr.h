@@ -1,7 +1,5 @@
 #ifndef LINKED_PTR_h
 #define LINKED_PTR_h
-#include <cstddef>
-#include <memory>
 
 namespace smart_ptr {
 
@@ -81,7 +79,7 @@ namespace smart_ptr {
         left_->right_ = right_;
         right_->left_ = left_;
 
-        left_ = right_ = nullptr;
+        left_ = right_ = this;
     }
 
     template <typename T>
