@@ -45,7 +45,7 @@ void array_stack_bounds_violation()
 static void memcpy_overlap()
 {
     int vec[10];
-    memcpy(&vec[0], &vec[2], sizeof(vec[0] * 3));
+    memcpy(&vec[0], &vec[2], sizeof(vec[0]) * 3);
 }
 
 void invalid_pointer_aliasing()
