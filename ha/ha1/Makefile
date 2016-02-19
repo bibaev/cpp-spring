@@ -3,7 +3,7 @@ SRC = ./src/
 
 OBJS = $(BIN)main.o
 TARGET = ./bin/linked_ptr
-CXXFLAGS = -O2 -std=c++11
+CXXFLAGS = -std=c++11 -Wall -Werror -g -O2
 
 all: bin build
 
@@ -15,6 +15,9 @@ $(BIN)%.o: $(SRC)%.cpp
 
 bin:
 	mkdir -p bin
+
+memcheck: all
+	valgrind --tool=memcheck --leak-check=full $(TARGET)
 
 clean:
 	rm -r $(BIN)*
