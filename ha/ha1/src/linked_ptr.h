@@ -4,7 +4,6 @@
 #include <functional>
 
 namespace smart_ptr {
-
     namespace helpers {
         class node {
         public:
@@ -65,7 +64,7 @@ namespace smart_ptr {
             left_ = other_left == &other ? this : other_left;
             right_ = other_right == &other ? this : other_right;
         }
-    }
+    } // helpers
 
     template<typename T>
     class linked_ptr {
@@ -99,7 +98,9 @@ namespace smart_ptr {
         T* operator->() const;
 
         operator bool() const;
-        helpers::node& getNode() const;
+
+        template<typename U>
+        friend class linked_ptr;
 
     private:
         mutable helpers::node node_;
@@ -138,7 +139,7 @@ namespace smart_ptr {
         : node_()
         , ptr_(other.get())
     {
-        other.getNode().insert_after_this(node_);
+        other.node_.insert_after_this(node_);
     }
 
     template <typename T>
@@ -216,11 +217,6 @@ namespace smart_ptr {
     template <typename T>
     linked_ptr<T>::operator bool() const {
         return ptr_ != nullptr;
-    }
-
-    template <typename T>
-    helpers::node& linked_ptr<T>::getNode() const {
-        return node_;
     }
 
     template<typename T, typename U>
