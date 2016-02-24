@@ -1,13 +1,10 @@
 #ifndef LINKED_PTR_h
 #define LINKED_PTR_h
 #include <cstddef>
-#include <memory>
+#include <functional>
 
 namespace smart_ptr {
-
-    template<typename T>
-    class linked_ptr {
-    private:
+    namespace helpers {
         class node {
         public:
             node();
@@ -24,20 +21,69 @@ namespace smart_ptr {
             node * right_;
         }; // node
 
+        inline node::node()
+            : left_(this)
+            , right_(this)
+        {}
+
+        inline node::~node() { extract(); }
+
+        inline bool node::unique() const { return left_ == this && right_ == this; }
+
+        inline void node::insert_after_this(node& other) {
+            other.right_ = right_;
+            other.left_ = this;
+
+            right_->left_ = &other;
+            right_ = &other;
+        }
+
+        inline void node::extract() {
+            left_->right_ = right_;
+            right_->left_ = left_;
+
+            left_ = right_ = this;
+        }
+
+        inline void node::swap(node& other) {
+            auto left = left_;
+            auto right = right_;
+
+            auto other_left = other.left_;
+            auto other_right = other.right_;
+
+            left->right_ = &other;
+            right->left_ = &other;
+
+            other_right->left_ = this;
+            other_left->right_ = this;
+
+            other.left_ = left == this ? &other : left;
+            other.right_ = right == this ? &other : right;
+
+            left_ = other_left == &other ? this : other_left;
+            right_ = other_right == &other ? this : other_right;
+        }
+    } // helpers
+
+    template<typename T>
+    class linked_ptr {
     public:
         linked_ptr();
+
         explicit linked_ptr(T*);
-        explicit linked_ptr(linked_ptr const &);
         template<typename U>
         explicit linked_ptr(U*);
+
+        linked_ptr(linked_ptr<T> const&);
         template<typename U>
-        explicit linked_ptr(linked_ptr<U>);
+        linked_ptr(linked_ptr<U> const&);
 
-        ~linked_ptr();
-
-        linked_ptr & operator=(linked_ptr const&);
+        linked_ptr & operator=(linked_ptr<T> const&);
         template<typename U>
         linked_ptr & operator=(linked_ptr<U> const&);
+
+        ~linked_ptr();
 
         void reset();
         void reset(T*);
@@ -53,64 +99,13 @@ namespace smart_ptr {
 
         operator bool() const;
 
+        template<typename U>
+        friend class linked_ptr;
+
     private:
-        mutable node node_;
+        mutable helpers::node node_;
         T* ptr_;
     }; // linked_ptr
-
-    template <typename T>
-    linked_ptr<T>::node::node()
-        : left_(this)
-        , right_(this)
-    {}
-
-    template <typename T>
-    bool linked_ptr<T>::node::unique() const {
-        return left_ == this && right_ == this;
-    }
-
-    template <typename T>
-    void linked_ptr<T>::node::insert_after_this(node& other) {
-        other.right_ = right_;
-        other.left_ = this;
-
-        right_->left_ = &other;
-        right_ = &other;
-    }
-
-    template <typename T>
-    void linked_ptr<T>::node::extract() {
-        left_->right_ = right_;
-        right_->left_ = left_;
-
-        left_ = right_ = this;
-    }
-
-    template <typename T>
-    void linked_ptr<T>::node::swap(node& other) {
-        auto left = left_;
-        auto right = right_;
-
-        auto other_left = other.left_;
-        auto other_right = other.right_;
-
-        left->right_ = &other;
-        right->left_ = &other;
-
-        other_right->left_ = this;
-        other_left->right_ = this;
-
-        other.left_ = left == this ? &other : left;
-        other.right_ = right == this ? &other : right;
-
-        left_ = other_left == &other ? this : other_left;
-        right_ = other_right == &other ? this : other_right;
-    }
-
-    template <typename T>
-    linked_ptr<T>::node::~node() {
-        extract();
-    }
 
     template <typename T>
     linked_ptr<T>::linked_ptr()
@@ -125,9 +120,9 @@ namespace smart_ptr {
     {}
 
     template <typename T>
-    linked_ptr<T>::linked_ptr(linked_ptr const& other)
+    linked_ptr<T>::linked_ptr(linked_ptr<T> const& other)
         : node_()
-        , ptr_(other.get()) {
+        , ptr_(other.ptr_) {
         other.node_.insert_after_this(node_);
     }
 
@@ -140,7 +135,12 @@ namespace smart_ptr {
 
     template <typename T>
     template <typename U>
-    linked_ptr<T>::linked_ptr(linked_ptr<U>) {}
+    linked_ptr<T>::linked_ptr(linked_ptr<U> const& other)
+        : node_()
+        , ptr_(other.get())
+    {
+        other.node_.insert_after_this(node_);
+    }
 
     template <typename T>
     linked_ptr<T>::~linked_ptr() {
@@ -152,7 +152,7 @@ namespace smart_ptr {
     }
 
     template <typename T>
-    linked_ptr<T>& linked_ptr<T>::operator=(linked_ptr const& other) {
+    linked_ptr<T>& linked_ptr<T>::operator=(linked_ptr<T> const& other) {
         linked_ptr<T> tmp(other);
         swap(tmp);
         return *this;
@@ -199,7 +199,9 @@ namespace smart_ptr {
     void linked_ptr<T>::swap(linked_ptr& other) {
         std::swap(ptr_, other.ptr_);
 
-        node_.swap(other.node_);
+        if (ptr_ != other.ptr_) {
+            node_.swap(other.node_);
+        }
     }
 
     template <typename T>

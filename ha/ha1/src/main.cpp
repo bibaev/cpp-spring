@@ -80,6 +80,21 @@ static void test_lptr_delete() {
     (void)lptr;
 }
 
+void test_derived_assignment() {
+    struct base {};
+    struct derived : base {};
+
+    linked_ptr<base> ptr1(new base());
+    linked_ptr<derived> ptr2(new derived());
+    ptr1 = ptr2;
+}
+
+void test_assignment() {
+    linked_ptr<int> ptr1(new int(5));
+    ptr1 = ptr1;
+    assert(*ptr1 == 5);
+}
+
 int main() {
     test_empty_lptr();
     test_one_lptr();
@@ -87,5 +102,8 @@ int main() {
     test_many_lptr();
     test_lptr_conversions();
     test_lptr_delete();
+
+    test_derived_assignment();
+    test_assignment();
     return 0;
 }
