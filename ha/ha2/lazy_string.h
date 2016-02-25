@@ -4,7 +4,6 @@
 #include <memory>
 
 namespace std_utils {
-    lazy_string
     template<class CharT, class Traits = std::char_traits<CharT>>
     class lazy_basic_string {
     public:
@@ -12,6 +11,7 @@ namespace std_utils {
     private:
         std::shared_ptr<char> buffer_;
     };
+
 }
 
 
