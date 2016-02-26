@@ -54,8 +54,10 @@ void test_constructors() {
 
 void test_assignment_operator() {
     lazy_string str1("abcdefg");
+    (void)str1;
     lazy_string str2("77712312ASD ASD sdasd");
-    str1 = std::move(str2);
+    str1 = move(str2);
+    (void)str1;
     assert(str2.empty()); // one of possible states after move
 }
 
@@ -92,6 +94,7 @@ void test_c_str() {
     lazy_string str(cstr);
     assert(!strcmp(cstr, str.c_str()));
     cstr = str.c_str();
+    assert(lazy_string("djghd") == cstr);
 }
 
 void test_swap() {
