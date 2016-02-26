@@ -1,5 +1,5 @@
-#ifndef LAZY_BASIC_STRING
-#define LAZY_BASIC_STRING
+#ifndef LAZY_STRING
+#define LAZY_STRING
 #include <iosfwd>
 #include <algorithm>
 #include <cctype>
@@ -85,7 +85,7 @@ namespace std_utils {
         const_reference get_at(size_type index);
 
         std::shared_ptr<buffer> shared_buffer_;
-    };
+    }; // lazy_basic_string
 
     template <class CharT, class Traits>
     lazy_basic_string<CharT, Traits>::proxy::proxy(proxy const& other)
@@ -398,4 +398,4 @@ namespace std_utils {
     typedef lazy_basic_string<char, ichar_traits> lazy_istring;
 } // std_utils
 
-#endif // LAZY_BASIC_STRING
+#endif // LAZY_STRING
