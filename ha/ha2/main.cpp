@@ -94,7 +94,7 @@ void test_c_str() {
     lazy_string str(cstr);
     assert(!strcmp(cstr, str.c_str()));
     cstr = str.c_str();
-    assert(lazy_string("djghd") == cstr);
+    assert(lazy_string("djghd") != cstr);
 }
 
 void test_swap() {
