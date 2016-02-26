@@ -12,7 +12,7 @@ namespace std_utils {
         typedef Traits traits_type;
         typedef typename Traits::char_type value_type;
         typedef size_t size_type;
-        typedef ptrdiff_t difference_type;
+        typedef std::ptrdiff_t difference_type;
         typedef value_type& reference;
         typedef value_type const& const_reference;
         typedef value_type* pointer;
@@ -26,7 +26,6 @@ namespace std_utils {
             proxy(lazy_basic_string& ls, size_t const ind) : ls_(ls), index_(ind) {}
             char operator=(char x) const {
                 ls_.set_at(x, index_);
-                delete this;
                 return x;
             }
 
@@ -136,7 +135,7 @@ namespace std_utils {
 
     template <class CharT, class Traits>
     lazy_basic_string<CharT, Traits>::buffer::~buffer() {
-        delete data_;
+        delete[] data_;
     }
 
     template <class CharT, class Traits>
