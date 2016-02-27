@@ -112,6 +112,20 @@ void test_lazy_wstring() {
     assert(str1 == str2);
 }
 
+void test_lazy() {
+    lazy_string str1("abc");
+    lazy_string str2(str1);
+    lazy_string str3 = str2;
+    assert(str1[0] == str3[0]);
+    assert(str3.use_count() == 3);
+    str3[0] = 'a';
+    assert(str1.use_count() == str3.use_count());
+    str3[0] = 'b';
+    assert(str1[0] == 'a');
+    assert(str3.use_count() == 1);
+    assert(str1.use_count() == 2);
+}
+
 int main() {
     test_internal_typedefs();
     test_empty_string();
@@ -123,6 +137,8 @@ int main() {
     test_c_str();
     test_swap();
     test_lazy_wstring();
+
+    test_lazy();
 
     std::cout << "ok!" << std::endl;
     return 0;

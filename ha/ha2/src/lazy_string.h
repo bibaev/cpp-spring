@@ -23,8 +23,8 @@ namespace std_utils {
             size_type index_;
         public:
             proxy(proxy const& other);
-            proxy(lazy_basic_string& ls, size_t const ind) : ls_(ls), index_(ind) {}
-            char operator=(char x) const {
+            proxy(lazy_basic_string& ls, size_t index) : ls_(ls), index_(index) {}
+            char operator=(value_type x) const {
                 ls_.set_at(x, index_);
                 return x;
             }
@@ -80,6 +80,12 @@ namespace std_utils {
         bool empty() const;
         const_pointer c_str() const;
         friend class proxy;
+
+#ifndef NDEBUG
+        size_t use_count() const {
+            return shared_buffer_.use_count();
+        }
+#endif
     private:
         void set_at(value_type value, size_type index);
         const_reference get_at(size_type index);
@@ -263,7 +269,15 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    void lazy_basic_string<CharT, Traits>::set_at(value_type value, size_type index) {}
+    void lazy_basic_string<CharT, Traits>::set_at(value_type value, size_type index) {
+        if(value != shared_buffer_->get_data()[index]) {
+            if(shared_buffer_.use_count() > 1) {
+                shared_buffer_ = std::make_shared<buffer>(shared_buffer_->get_data());
+            }
+
+            shared_buffer_->get_data()[index] = value;
+        }
+    }
 
     template <class CharT, class Traits>
     typename lazy_basic_string<CharT, Traits>::const_reference lazy_basic_string<CharT, Traits>::get_at(size_type index) {
