@@ -83,6 +83,75 @@ private:
     std::vector<Arg> values_;
 };
 
+template<typename container_it>
+struct linearized_container_iterator : std::iterator<
+    std::forward_iterator_tag,
+    typename std::iterator_traits<typename std::iterator_traits<container_it>::value_type::iterator>::value_type
+    > {
+    linearized_container_iterator(container_it begin, container_it end) 
+        : current_container_iterator_(begin)
+        , end_container_iterator_(end)
+        , current_iterator_(begin->begin())
+    {}
+
+    linearized_container_iterator() {}
+
+    linearized_container_iterator(linearized_container_iterator & other) = default;
+
+    linearized_container_iterator& operator++() {
+        if(current_container_iterator_ == end_container_iterator_) {
+            return *this;
+        }
+
+        ++current_iterator_;
+        if(current_iterator_ == current_container_iterator_->end()) {
+            ++current_container_iterator_;
+            if(current_container_iterator_ == end_container_iterator_) {
+                return *this;
+            }
+            current_iterator_ = current_container_iterator_->begin();
+            if(current_iterator_ == current_container_iterator_->end()) {
+                ++(*this);
+            }
+        }
+
+        return *this;
+    }
+
+    linearized_container_iterator& operator++(int) {
+        linearized_container_iterator tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+
+    bool operator==(linearized_container_iterator const& other) {
+        return current_container_iterator_ == end_container_iterator_ &&
+            other.current_container_iterator_ == other.end_container_iterator_;
+    }
+
+    bool operator!=(linearized_container_iterator const &other) {
+        return !((*this) == other);
+    }
+
+    typename container_it::value_type::value_type operator*() {
+        return *current_iterator_;
+    }
+private:
+    container_it current_container_iterator_;
+    container_it end_container_iterator_;
+    typename container_it::value_type::iterator current_iterator_;
+};
+
+template<typename container_of_container>
+linearized_container_iterator<typename container_of_container::iterator> make_linearized_container_iterator(container_of_container & src) {
+    return linearized_container_iterator<typename container_of_container::iterator>(src.begin(), src.end());
+}
+
+template<typename container_of_container>
+linearized_container_iterator<typename container_of_container::iterator> make_linearized_container_iterator() {
+    return linearized_container_iterator<typename container_of_container::iterator>();
+}
+
 void tests() {
     int sorted[] = { 1, 2, 3, 3, 4, 5, 6, 7, 7, 7, 7 };
     assert(elem_num_in_sorted(sorted, sorted + 11, 2, std::less<int>()) == 1);
@@ -118,6 +187,17 @@ void tests() {
     erase_if(str_vec, std::ref(filter));
     
     print(str_vec.begin(), str_vec.end());
+
+    typedef std::vector<std::vector<int>> vec_vec_int_t;
+    vec_vec_int_t vec_vec_int = {
+        { 1, 2, 3 },
+        { 4, 5, 6 },
+        { 7, 8, 9 },
+        { 10, 11, 12 }
+    };
+
+    auto vec_vec_linearized_it = make_linearized_container_iterator(vec_vec_int);
+    print(vec_vec_linearized_it, make_linearized_container_iterator<vec_vec_int_t>());
 }
 
 int main() {
