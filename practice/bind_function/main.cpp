@@ -78,8 +78,8 @@ static void test_task4() {
 
 int main() {
     test_task1();
-   /* test_task2();
-    test_task3();*/
+    test_task2();
+    test_task3();
     test_task4();
     return 0;
 }
