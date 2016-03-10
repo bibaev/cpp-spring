@@ -1,24 +1,47 @@
+#pragma once
 #include <stdlib.h>
 #include <queue>
 #include <functional>
+#include <iostream>
 
-template<typename PRIOR=size_t, typename COMP=std::less<PRIOR>()>
+template<typename PRIOR=size_t, typename COMP=std::less<PRIOR>>
 struct priority_task_queue
 {
+private:
 	typedef std::function<void()> function;
-	ordered_task_queue() = default;
-	ordered_task_queue(ordered_task_queue && other) {
+	typedef std::pair<std::function<void()>, PRIOR> prior_pair;
+	class comparer {
+	public:
+		comparer(COMP const & comp) 
+			: comparator_(comp){
+				
+			}
+	
+		bool operator()(prior_pair const& left, prior_pair const& right) {
+			return comparator_(left.second, right.second);
+		}
+	private:
+		COMP comparator_;
+	};
+public:
+	
+	priority_task_queue(COMP const& cmp = COMP()) 
+		: queue_(std::priority_queue<std::pair<function, PRIOR>, std::vector<std::pair<function, PRIOR>>, comparer>(comparer(cmp)))	
+	{
+		
+	}
+	priority_task_queue(ordered_task_queue && other) {
 		std::swap(other.queue_, queue_);
 	}
-	ordered_task_queue(ordered_task_queue const& other) = delete;
-	ordered_task_queue& operator=(ordered_task_queue const& other) = delete;
-	void push(function const& task){
-		queue_.push(task);
+	priority_task_queue(priority_task_queue const& other) = delete;
+	priority_task_queue& operator=(priority_task_queue const& other) = delete;
+	void push(function const& task, PRIOR priority){
+		queue_.push(std::make_pair(task, priority));
 	}
 	size_t run_one() {
 		size_t result = 0;
 		if(!queue_.empty()) {
-			queue_.front()();
+			queue_.top().first();
 			queue_.pop();
 			++result;
 		}
@@ -38,5 +61,17 @@ struct priority_task_queue
 	}
 
 private:
-	std::priority_queue<function> queue_;
+	std::priority_queue<std::pair<function, PRIOR>, std::vector<std::pair<function, PRIOR>>, comparer> queue_;
 };
+
+template<class fwd_it>
+void sleep_sort(fwd_it begin, fwd_it end) {
+	auto it = begin;
+	priority_task_queue<typename fwd_it::value_type> queue{};
+	while(begin != end) {
+		auto value = *begin;
+		queue.push([&it, value]() { *it = value; ++it; }, *begin); ++begin;
+	}
+	
+	queue.run();
+}

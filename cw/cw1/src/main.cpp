@@ -6,7 +6,7 @@
 
 #define TEST_TASK1
 #define TEST_TASK2
-// #define TEST_TASK3
+#define TEST_TASK3
 
 #ifdef TEST_TASK1
 
@@ -113,7 +113,7 @@ void test_copy_constructor()
 #endif // TEST_TASK1
 
 #ifdef TEST_TASK2
-#include <priority_task_queue.h>
+#include "priority_task_queue.h"
 
 void test_priority_two_elements()
 {
@@ -205,7 +205,7 @@ void test_priority_many_elements()
 #endif // TEST_TASK2
 
 #ifdef TEST_TASK3
-#include <priority_task_queue.h>
+#include "priority_task_queue.h"
 
 template<class fwd_it>
 void sort_and_compare(fwd_it beg, fwd_it end)
