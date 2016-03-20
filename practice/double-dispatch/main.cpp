@@ -3,12 +3,12 @@
 #include <memory>
 
 struct shape {
-protected:
-    ~shape()
+public:
+    virtual ~shape()
     {
+        std::cout << "virtual ~shape call." << std::endl;
     }
 
-public:
     virtual void intersect(shape& other) = 0;
     virtual void intersect_impl(struct point&) = 0;
     virtual void intersect_impl(struct rectangle&) = 0;
@@ -129,15 +129,18 @@ void circle::intersect_impl(circle& other)
     std::cout << "Intersect circle and circle." << std::endl;
 }
 
-int main() {
+
+void virt_func_tests() {
     std::vector<std::shared_ptr<shape>> shapes = { std::make_shared<point>(1, 2)
-                                                    , std::make_shared<rectangle>(point(0, 10), point(10, 0))
-                                                    , std::make_shared<circle>(point(10, 0), 10.)};
-    for(auto& shape1 : shapes)
-    {
-        for(auto& shape2 : shapes)
-        {
+        , std::make_shared<rectangle>(point(0, 10), point(10, 0))
+        , std::make_shared<circle>(point(10, 0), 10.) };
+    for (auto& shape1 : shapes) {
+        for (auto& shape2 : shapes) {
             intersect(*shape1, *shape2);
         }
     }
 }
+
+//int main() {
+//    virt_func_tests();
+//}
