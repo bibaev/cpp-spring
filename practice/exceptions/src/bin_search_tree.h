@@ -84,7 +84,23 @@ private:
 } // namespace details
 
 // TODO bst_key_exists_exception: std::logic_error
+struct bst_key_exists_exception : std::logic_error {
+	explicit bst_key_exists_exception(const std::string& message)
+		: logic_error(message) {}
+
+	explicit bst_key_exists_exception(const char* message)
+		: logic_error(message) {}
+};
+
 // TODO bst_key_absent_exception: std::logic_error
+struct bst_key_absent_exception: std::logic_error {
+	explicit bst_key_absent_exception(const std::string& message)
+		: logic_error(message) {}
+
+	explicit bst_key_absent_exception(const char* message)
+		: logic_error(message) {}
+};
+
 
 // KEY should have operator <, <<, () constructor
 template<class KEY, class VALUE>
@@ -101,6 +117,7 @@ struct bin_search_tree
 
     // throws bst_key_absent_exception
     VALUE& find(const KEY &key);
+	bool contains(const KEY &key) noexcept;
 private:
     typedef details::node<KEY, VALUE> node;
     node* find_nearest_node(const KEY &key);
@@ -110,6 +127,47 @@ private:
 
     std::unique_ptr<node> root_ptr_;
 };
+
+template <class KEY, class VALUE>
+void bin_search_tree<KEY, VALUE>::insert(const KEY& key, const VALUE& val) {
+	std::unique_ptr<node> new_node(new node(key, val));
+	reinsert_node(std::move(new_node));
+}
+
+template <class KEY, class VALUE>
+template <class KIT, class VIT>
+void bin_search_tree<KEY, VALUE>::insert(KIT kbegin, KIT kend, VIT vbegin) {
+	size_t count = std::distance(kbegin, kend);
+	std::vector<std::unique_ptr<node>> new_nodes;
+
+	auto kcur = kbegin;
+	auto vcur = vbegin;
+	size_t filled;
+	for (filled = 0; filled < count; ++filled) {
+		new_nodes.emplace_back(new node(*kcur, *vcur));
+		++kcur; ++vcur;
+	}
+
+	for (size_t i = 0; i < count; ++i) {
+		reinsert_node(std::move(new_nodes[i]));
+	}
+}
+
+template <class KEY, class VALUE>
+VALUE& bin_search_tree<KEY, VALUE>::find(const KEY& key) {
+	auto nearest = find_nearest_node(key);
+	if (nearest == nullptr || nearest->key() != key) {
+		throw bst_key_absent_exception("Key not found.");
+	}
+
+	return nearest->value();
+}
+
+template <class KEY, class VALUE>
+bool bin_search_tree<KEY, VALUE>::contains(const KEY& key) {
+	auto nearest = find_nearest_node(key);
+	return nearest != nullptr && nearest->key() == key;
+}
 
 template<class KEY, class VALUE>
 auto bin_search_tree<KEY, VALUE>::find_nearest_node(const KEY &key) -> node*
@@ -133,6 +191,35 @@ auto bin_search_tree<KEY, VALUE>::find_nearest_node(const KEY &key) -> node*
     }
     assert(cur_node);
     return cur_node;
+}
+
+template <class KEY, class VALUE>
+void bin_search_tree<KEY, VALUE>::reinsert_node(std::unique_ptr<node>&& node_ptr) {
+	if (root_ptr_ == nullptr) {
+		root_ptr_ = node_ptr;
+		return;
+	}
+
+	auto current_node = root_ptr_.get();
+	
+	auto next_child = current_node;
+	while (true) {
+		next_child = should_go_right(current_node, current_node->key())
+			? current_node->right()
+			: current_node->left();
+		if (next_child == nullptr) {
+			break;
+		}
+
+		current_node = next_child;
+	}
+
+	if (should_go_right(current_node, current_node->key())) {
+		current_node->takeRight(node_ptr);
+	}
+	else {
+		current_node->takeLeft(node_ptr);
+	}
 }
 
 template<class KEY, class VALUE>
