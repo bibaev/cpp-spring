@@ -12,10 +12,12 @@ namespace details
 {
 
 template<class KEY, class VALUE>
-struct node
-{
-    node(const KEY &key, const VALUE &val)
-    {}
+struct node {
+    node(const KEY &key, const VALUE &val) 
+		: key_(key)
+		, value_(val)
+		, parent_(nullptr)
+	{}
 
     ~node() noexcept
     {}
@@ -28,39 +30,55 @@ struct node
 
     void putLeft(std::unique_ptr<node> &&nptr) noexcept
     {
+		right_ = std::move(nptr);
     }
 
     std::unique_ptr<node> takeLeft() noexcept
     {
+		return std::move(left_);
     }
 
     void putRight(std::unique_ptr<node> &&nptr) noexcept
     {
+		right_ = std::move(nptr);
     }
 
     std::unique_ptr<node> takeRight() noexcept
     {
+		return std::move(right_);
     }
 
     node*& parent() noexcept
     {
+		return parent_;
     }
 
     node* left() noexcept
     {
+		return left_.get();
     }
 
     node* right() noexcept
     {
+		return right_.get();
     }
 
     KEY& key() noexcept
     {
+		return key_;
     }
 
     VALUE &value() noexcept
     {
+		return value_;
     }
+
+private:
+	KEY key_;
+	VALUE value_;
+	node* parent_;
+	std::unique_ptr<node> left_;
+	std::unique_ptr<node> right_;
 };
 
 } // namespace details
