@@ -124,6 +124,7 @@ void run_test(FUNC func)
 
 int main()
 {
+	test_tree1();
     run_test(test_empty_tree);
     run_test(test_single_element_tree);
     run_test(test_tree1);

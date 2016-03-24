@@ -25,8 +25,8 @@ void* operator new(std::size_t count)
 
     if (fdistr.should_fault())
     {
-        std::cerr << "injecting allocation fault" << std::endl;
-        throw std::bad_alloc();
+        //std::cerr << "injecting allocation fault" << std::endl;
+        //throw std::bad_alloc();
     }
 
     return malloc(count);

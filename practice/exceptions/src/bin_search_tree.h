@@ -2,11 +2,8 @@
 #include <memory>
 #include <stdexcept>
 #include <cassert>
-#include <string>
-#include <sstream>
 #include <iterator>
 #include <vector>
-#include <utility>
 
 namespace details
 {
@@ -30,7 +27,7 @@ struct node {
 
     void putLeft(std::unique_ptr<node> &&nptr) noexcept
     {
-		right_ = std::move(nptr);
+		left_ = std::move(nptr);
     }
 
     std::unique_ptr<node> takeLeft() noexcept
@@ -121,6 +118,7 @@ struct bin_search_tree
 private:
     typedef details::node<KEY, VALUE> node;
     node* find_nearest_node(const KEY &key);
+    void insert_node(std::unique_ptr<node> &&node_ptr);
     void reinsert_node(std::unique_ptr<node> &&node_ptr) noexcept;
     void erase_node(node *node) noexcept;
     static bool should_go_right(node *parent, const KEY &key);
@@ -131,7 +129,7 @@ private:
 template <class KEY, class VALUE>
 void bin_search_tree<KEY, VALUE>::insert(const KEY& key, const VALUE& val) {
 	std::unique_ptr<node> new_node(new node(key, val));
-	reinsert_node(std::move(new_node));
+	insert_node(std::move(new_node));
 }
 
 template <class KEY, class VALUE>
@@ -144,12 +142,16 @@ void bin_search_tree<KEY, VALUE>::insert(KIT kbegin, KIT kend, VIT vbegin) {
 	auto vcur = vbegin;
 	size_t filled;
 	for (filled = 0; filled < count; ++filled) {
+		if (contains(*kcur)) {
+			throw bst_key_exists_exception("Key already exists.");
+		}
+
 		new_nodes.emplace_back(new node(*kcur, *vcur));
 		++kcur; ++vcur;
 	}
 
 	for (size_t i = 0; i < count; ++i) {
-		reinsert_node(std::move(new_nodes[i]));
+		insert_node(std::move(new_nodes[i]));
 	}
 }
 
@@ -164,7 +166,7 @@ VALUE& bin_search_tree<KEY, VALUE>::find(const KEY& key) {
 }
 
 template <class KEY, class VALUE>
-bool bin_search_tree<KEY, VALUE>::contains(const KEY& key) {
+bool bin_search_tree<KEY, VALUE>::contains(const KEY& key) noexcept {
 	auto nearest = find_nearest_node(key);
 	return nearest != nullptr && nearest->key() == key;
 }
@@ -194,17 +196,17 @@ auto bin_search_tree<KEY, VALUE>::find_nearest_node(const KEY &key) -> node*
 }
 
 template <class KEY, class VALUE>
-void bin_search_tree<KEY, VALUE>::reinsert_node(std::unique_ptr<node>&& node_ptr) {
+void bin_search_tree<KEY, VALUE>::insert_node(std::unique_ptr<node>&& node_ptr) {
 	if (root_ptr_ == nullptr) {
-		root_ptr_ = node_ptr;
+		root_ptr_ = std::move(node_ptr);
 		return;
 	}
 
 	auto current_node = root_ptr_.get();
-	
+
 	auto next_child = current_node;
 	while (true) {
-		next_child = should_go_right(current_node, current_node->key())
+		next_child = should_go_right(current_node, node_ptr->key())
 			? current_node->right()
 			: current_node->left();
 		if (next_child == nullptr) {
@@ -214,11 +216,23 @@ void bin_search_tree<KEY, VALUE>::reinsert_node(std::unique_ptr<node>&& node_ptr
 		current_node = next_child;
 	}
 
-	if (should_go_right(current_node, current_node->key())) {
-		current_node->takeRight(node_ptr);
+	node_ptr->parent() = current_node;
+	if (should_go_right(current_node, node_ptr->key())) {
+		current_node->putRight(std::move(node_ptr));
 	}
 	else {
-		current_node->takeLeft(node_ptr);
+		current_node->putLeft(std::move(node_ptr));
+	}
+}
+
+
+template <class KEY, class VALUE>
+void bin_search_tree<KEY, VALUE>::reinsert_node(std::unique_ptr<node>&& node_ptr) noexcept {
+	try {
+		insert_node(std::move(node_ptr));
+	}
+	catch(std::exception const& ex) {
+		assert(false);
 	}
 }
 
