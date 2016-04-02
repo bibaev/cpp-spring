@@ -109,7 +109,13 @@ void test_swap() {
 void test_lazy_wstring() {
     lazy_wstring str1(L"Hell\xF6\x0A");
     lazy_wstring str2(L"Hell\xF6\x0A");
+    lazy_wstring str3(L"Hell\xF7\x0A");
     assert(str1 == str2);
+    assert(str1 != str3);
+    assert(str2 != str3);
+
+    str3[4] = L'\xF6';
+    assert(str1 == str3);
 }
 
 void test_lazy() {
@@ -126,6 +132,56 @@ void test_lazy() {
     assert(str1.use_count() == 2);
 }
 
+void test_comparison() {
+    // TODO fix commented.
+    assert("a" < lazy_string("b"));
+    assert(lazy_string("a") < lazy_string("b"));
+    assert("a" == lazy_string("a"));
+    assert(lazy_string("b") != "a");
+    assert(lazy_string("b") >= "a");
+    assert("b" > lazy_string("a"));
+
+    assert("b" < lazy_string('b', 2));
+    assert(lazy_string('c', 5) == "ccccc");
+
+    assert("aa" < lazy_string('b', 10));
+    assert("bbbb" < lazy_string('b', 5));
+    assert("bbbb" <= lazy_string("bbbb"));
+}
+
+void test_icomparison() {
+    // TODO: fix it.
+    assert(lazy_istring("abc") == lazy_istring("abc"));
+    assert(lazy_istring("ABC") == lazy_istring("abc"));
+    // assert("AbC" == lazy_istring("abc"));
+    // assert(lazy_istring("AbCd") == "abcd");
+    // assert(lazy_istring("ABC") <= lazy_istring("abc"));    
+}
+
+void test_concat() {
+    // TODO: replace operator+ to operator+ out-scoped class lazy_string.
+    lazy_string str1("a");
+    assert(str1 + 'b' == "ab");
+    assert('b' + str1 == "ba");
+    assert("b" + str1 == "ba");
+    assert(str1 + "b" == "ab");
+    str1 += 'b';
+    assert("a" != str1);
+    assert("ab" == str1);
+    assert(str1 == "ab");
+    str1 += "cd";
+    assert("abcd" == str1);
+
+}
+
+void my_tests() {
+    test_lazy();
+
+    test_comparison();
+    test_icomparison();
+    test_concat();
+}
+
 int main() {
     test_internal_typedefs();
     test_empty_string();
@@ -138,7 +194,7 @@ int main() {
     test_swap();
     test_lazy_wstring();
 
-    test_lazy();
+    my_tests();
 
     std::cout << "ok!" << std::endl;
     return 0;

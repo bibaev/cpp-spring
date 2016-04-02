@@ -364,7 +364,7 @@ namespace std_utils {
     bool operator<(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
         auto right_size = Traits::length(right);
         auto cmp_result = Traits::compare(left.c_str(), right, std::min(left.size(), right_size));
-        return cmp_result < 0 || (cmp_result == 0 && left.size() < right.size());
+        return cmp_result < 0 || (cmp_result == 0 && left.size() < right_size);
     }
 
     template<typename CharT, class Traits>
@@ -403,7 +403,7 @@ namespace std_utils {
         }
         
         static bool lt(char left, char right) {
-            return tolower(left) == tolower(right);
+            return tolower(left) < tolower(right);
         }
     };
 
