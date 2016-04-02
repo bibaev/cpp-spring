@@ -405,6 +405,16 @@ namespace std_utils {
         static bool lt(char left, char right) {
             return tolower(left) < tolower(right);
         }
+
+        static int compare(const char* left, const char* right, size_t count) {
+            for (size_t i = 0; i < count; ++i) {
+                if(!eq(left[i], right[i])) {
+                    return lt(left[i], right[i]) ? -1 : 1;
+                }
+            }
+
+            return 0;
+        }
     };
 
     typedef lazy_basic_string<char> lazy_string;

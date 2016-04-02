@@ -150,12 +150,10 @@ void test_comparison() {
 }
 
 void test_icomparison() {
-    // TODO: fix it.
     assert(lazy_istring("abc") == lazy_istring("abc"));
     assert(lazy_istring("ABC") == lazy_istring("abc"));
-    // assert("AbC" == lazy_istring("abc"));
-    // assert(lazy_istring("AbCd") == "abcd");
-    // assert(lazy_istring("ABC") <= lazy_istring("abc"));    
+    assert(lazy_istring("AbCd") == "abcd");
+    assert(lazy_istring("ABC") <= lazy_istring("abc"));    
 }
 
 void test_concat() {
@@ -171,7 +169,6 @@ void test_concat() {
     assert(str1 == "ab");
     str1 += "cd";
     assert("abcd" == str1);
-
 }
 
 void my_tests() {
