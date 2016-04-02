@@ -24,12 +24,12 @@ namespace std_utils {
         public:
             proxy(proxy const& other);
             proxy(lazy_basic_string& ls, size_t index) : ls_(ls), index_(index) {}
-            char operator=(value_type x) const {
+            value_type operator=(value_type x) const {
                 ls_.set_at(x, index_);
                 return x;
             }
 
-            operator char() const {
+            operator value_type() const {
                 return ls_.get_at(index_);
             }
         }; // proxy
@@ -51,7 +51,7 @@ namespace std_utils {
         private:
             pointer data_;
             size_type size_;
-        }; // shared_buffer  
+        }; // buffer  
     public:
         lazy_basic_string();
         lazy_basic_string(lazy_basic_string const& other);
@@ -79,7 +79,6 @@ namespace std_utils {
         size_type size() const;
         bool empty() const;
         const_pointer c_str() const;
-        friend class proxy;
 
 #ifndef NDEBUG
         size_t use_count() const {
@@ -233,8 +232,7 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::const_reference lazy_basic_string<CharT, Traits>::operator[](size_type index) const
-    {
+    typename lazy_basic_string<CharT, Traits>::const_reference lazy_basic_string<CharT, Traits>::operator[](size_type index) const {
         return shared_buffer_->get_data()[index];
     }
 
@@ -301,8 +299,10 @@ namespace std_utils {
 
     template<typename CharT, class Traits>
     bool operator==(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
-        return left.size() == right.size() &&
-            Traits::compare(left.c_str(), right.c_str(), std::min(left.size(), right.size())) == 0;
+        size_t left_size = left.size();
+        size_t right_size = right.size();
+        return left_size == right_size &&
+            Traits::compare(left.c_str(), right.c_str(), std::min(left_size, right_size)) == 0;
     }
 
     template<typename CharT, class Traits>
@@ -312,8 +312,10 @@ namespace std_utils {
 
     template<typename CharT, class Traits>
     bool operator<(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
-        auto cmp_result = Traits::compare(left.c_str(), right.c_str(), std::min(left.size(), right.size()));
-        return cmp_result < 0 || (cmp_result == 0 && left.size() < right.size());
+        size_t left_size = left.size();
+        size_t right_size = right.size();
+        auto cmp_result = Traits::compare(left.c_str(), right.c_str(), std::min(left_size, right_size));
+        return cmp_result < 0 || (cmp_result == 0 && left_size < right_size);
     }
 
     template<typename CharT, class Traits>
@@ -355,16 +357,18 @@ namespace std_utils {
 
     template<typename CharT, class Traits>
     bool operator<(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits> const& right) {
-        auto left_size = Traits::length(left);
-        auto cmp_result = Traits::compare(left, right.c_str(), std::min(left_size, right.size()));
-        return cmp_result < 0 || (cmp_result == 0 && left_size < right.size());
+        size_t left_size = Traits::length(left);
+        size_t right_size = right.size();
+        auto cmp_result = Traits::compare(left, right.c_str(), std::min(left_size, right_size));
+        return cmp_result < 0 || (cmp_result == 0 && left_size < right_size);
     }
 
     template<typename CharT, class Traits>
     bool operator<(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
-        auto right_size = Traits::length(right);
-        auto cmp_result = Traits::compare(left.c_str(), right, std::min(left.size(), right_size));
-        return cmp_result < 0 || (cmp_result == 0 && left.size() < right_size);
+        size_t left_size = left.size();
+        size_t right_size = Traits::length(right);
+        auto cmp_result = Traits::compare(left.c_str(), right, std::min(left_size, right_size));
+        return cmp_result < 0 || (cmp_result == 0 && left_size < right_size);
     }
 
     template<typename CharT, class Traits>

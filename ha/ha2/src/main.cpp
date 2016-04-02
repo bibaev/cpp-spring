@@ -140,10 +140,13 @@ void test_comparison() {
     assert(lazy_string("b") != "a");
     assert(lazy_string("b") >= "a");
     assert("b" > lazy_string("a"));
+    assert(lazy_string("b") > "a");
 
+    assert("c" > lazy_string('b', 1));
     assert("b" < lazy_string('b', 2));
     assert(lazy_string('c', 5) == "ccccc");
 
+    lazy_string str1('b', 5);
     assert("aa" < lazy_string('b', 10));
     assert("bbbb" < lazy_string('b', 5));
     assert("bbbb" <= lazy_string("bbbb"));
