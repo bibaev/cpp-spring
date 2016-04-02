@@ -398,18 +398,12 @@ namespace std_utils {
     }
 
     struct ichar_traits: std::char_traits<char> {
-        static bool eq(char left, char right) {
-            return tolower(left) == tolower(right);
-        }
-        
-        static bool lt(char left, char right) {
-            return tolower(left) < tolower(right);
-        }
-
         static int compare(const char* left, const char* right, size_t count) {
             for (size_t i = 0; i < count; ++i) {
-                if(!eq(left[i], right[i])) {
-                    return lt(left[i], right[i]) ? -1 : 1;
+                char l = tolower(left[i]);
+                char r = tolower(right[i]);
+                if(l != r) {
+                    return l < r ? -1 : 1;
                 }
             }
 
