@@ -133,7 +133,6 @@ void test_lazy() {
 }
 
 void test_comparison() {
-    // TODO fix commented.
     assert("a" < lazy_string("b"));
     assert(lazy_string("a") < lazy_string("b"));
     assert("a" == lazy_string("a"));
@@ -160,7 +159,6 @@ void test_icomparison() {
 }
 
 void test_concat() {
-    // TODO: replace operator+ to operator+ out-scoped class lazy_string.
     lazy_string str1("a");
     assert(str1 + 'b' == "ab");
     assert('b' + str1 == "ba");

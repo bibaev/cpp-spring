@@ -63,10 +63,6 @@ namespace std_utils {
         lazy_basic_string& operator=(lazy_basic_string const& other);
         lazy_basic_string& operator=(lazy_basic_string && other);
 
-        lazy_basic_string operator+(lazy_basic_string const& other);
-        lazy_basic_string operator+(const_pointer other);
-        lazy_basic_string operator+(value_type ch);
-
         lazy_basic_string& operator+=(lazy_basic_string const& other);
         lazy_basic_string& operator+=(const_pointer other);
         lazy_basic_string& operator+=(value_type ch);
@@ -193,18 +189,19 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits> lazy_basic_string<CharT, Traits>::operator+(lazy_basic_string const& other) {
-        return lazy_basic_string<CharT, Traits>(*this) += other;
+    lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left,  lazy_basic_string<CharT, Traits> const& right) {
+        return left += right;
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits> lazy_basic_string<CharT, Traits>::operator+(const_pointer other) {
-        return lazy_basic_string<CharT, Traits>(*this) += other;
+    lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left, 
+        typename lazy_basic_string<CharT, Traits>::const_pointer other) {
+        return left += other;
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits> lazy_basic_string<CharT, Traits>::operator+(value_type ch) {
-        return lazy_basic_string<CharT, Traits>(*this) += lazy_basic_string<CharT, Traits>(ch, 1);
+    lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left, typename lazy_basic_string<CharT, Traits>::value_type ch) {
+        return left += lazy_basic_string<CharT, Traits>(ch, 1);
     }
 
     template <class CharT, class Traits>
