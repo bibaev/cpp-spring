@@ -5,6 +5,8 @@
 #include <cctype>
 #include <memory>
 
+
+
 namespace std_utils {
     template<class CharT, class Traits = std::char_traits<CharT>>
     class lazy_basic_string {
@@ -140,17 +142,20 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::pointer lazy_basic_string<CharT, Traits>::buffer::get_data() {
+    typename lazy_basic_string<CharT, Traits>::pointer 
+        lazy_basic_string<CharT, Traits>::buffer::get_data() {
         return data_;
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::const_pointer lazy_basic_string<CharT, Traits>::buffer::get_data() const {
+    typename lazy_basic_string<CharT, Traits>::const_pointer 
+        lazy_basic_string<CharT, Traits>::buffer::get_data() const {
         return data_;
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::size_type lazy_basic_string<CharT, Traits>::buffer::get_size() const {
+    typename lazy_basic_string<CharT, Traits>::size_type 
+        lazy_basic_string<CharT, Traits>::buffer::get_size() const {
         return size_;
     }
 
@@ -176,41 +181,47 @@ namespace std_utils {
     {}
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits>& lazy_basic_string<CharT, Traits>::operator=(lazy_basic_string const& other) {
+    lazy_basic_string<CharT, Traits>& 
+        lazy_basic_string<CharT, Traits>::operator=(lazy_basic_string const& other) {
         shared_buffer_ = other.shared_buffer_;
         return *this;
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits>& lazy_basic_string<CharT, Traits>::operator=(lazy_basic_string&& other) {
+    lazy_basic_string<CharT, Traits>&
+        lazy_basic_string<CharT, Traits>::operator=(lazy_basic_string&& other) {
         clear();
         swap(other);
         return *this;
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left,  lazy_basic_string<CharT, Traits> const& right) {
+    lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left,  
+            lazy_basic_string<CharT, Traits> const& right) {
         return left += right;
     }
 
     template <class CharT, class Traits>
     lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left, 
-        typename lazy_basic_string<CharT, Traits>::const_pointer other) {
+            typename lazy_basic_string<CharT, Traits>::const_pointer other) {
         return left += other;
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left, typename lazy_basic_string<CharT, Traits>::value_type ch) {
+    lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left, 
+            typename lazy_basic_string<CharT, Traits>::value_type ch) {
         return left += lazy_basic_string<CharT, Traits>(ch, 1);
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits>& lazy_basic_string<CharT, Traits>::operator+=(lazy_basic_string const& other) {
+    lazy_basic_string<CharT, Traits>&
+            lazy_basic_string<CharT, Traits>::operator+=(lazy_basic_string const& other) {
         return this->operator+=(other.c_str());
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits>& lazy_basic_string<CharT, Traits>::operator+=(const_pointer other) {
+    lazy_basic_string<CharT, Traits>& 
+            lazy_basic_string<CharT, Traits>::operator+=(const_pointer other) {
         auto other_size = Traits::length(other);
         if(other_size == 0) {
             return *this;
@@ -222,19 +233,22 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits>& lazy_basic_string<CharT, Traits>::operator+=(value_type ch) {
+    lazy_basic_string<CharT, Traits>& 
+            lazy_basic_string<CharT, Traits>::operator+=(value_type ch) {
         lazy_basic_string<CharT, Traits> other(ch, 1);
         this->operator+=(other);
         return *this;
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::const_reference lazy_basic_string<CharT, Traits>::operator[](size_type index) const {
+    typename lazy_basic_string<CharT, Traits>::const_reference 
+            lazy_basic_string<CharT, Traits>::operator[](size_type index) const {
         return shared_buffer_->get_data()[index];
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::proxy lazy_basic_string<CharT, Traits>::operator[](size_type index) {
+    typename lazy_basic_string<CharT, Traits>::proxy 
+            lazy_basic_string<CharT, Traits>::operator[](size_type index) {
         return proxy(*this, index);
     }
 
@@ -249,7 +263,8 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::size_type lazy_basic_string<CharT, Traits>::size() const {
+    typename lazy_basic_string<CharT, Traits>::size_type 
+            lazy_basic_string<CharT, Traits>::size() const {
         return shared_buffer_->get_size();
     }
 
@@ -259,7 +274,8 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::const_pointer lazy_basic_string<CharT, Traits>::c_str() const {
+    typename lazy_basic_string<CharT, Traits>::const_pointer 
+        lazy_basic_string<CharT, Traits>::c_str() const {
         return shared_buffer_->get_data();
     }
 
@@ -275,7 +291,8 @@ namespace std_utils {
     }
 
     template <class CharT, class Traits>
-    typename lazy_basic_string<CharT, Traits>::const_reference lazy_basic_string<CharT, Traits>::get_at(size_type index) {
+    typename lazy_basic_string<CharT, Traits>::const_reference 
+            lazy_basic_string<CharT, Traits>::get_at(size_type index) {
         return shared_buffer_->get_data()[index];
     }
 
@@ -285,17 +302,22 @@ namespace std_utils {
     }
 
     template<typename CharT, class Traits>
-    lazy_basic_string<CharT, Traits> operator+(typename lazy_basic_string<CharT, Traits>::const_reference left, lazy_basic_string<CharT, Traits>& right) {
+    lazy_basic_string<CharT, Traits> 
+            operator+(typename lazy_basic_string<CharT, Traits>::const_reference left, 
+                    lazy_basic_string<CharT, Traits>& right) {
         return lazy_basic_string<CharT, Traits>(left, 1) += right;
     }
 
     template<typename CharT, class Traits>
-    lazy_basic_string<CharT, Traits> operator+(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits>& right) {
+    lazy_basic_string<CharT, Traits> 
+            operator+(typename lazy_basic_string<CharT, Traits>::const_pointer left, 
+                    lazy_basic_string<CharT, Traits>& right) {
         return lazy_basic_string<CharT, Traits>(left) += right;
     }
 
     template<typename CharT, class Traits>
-    bool operator==(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator==(lazy_basic_string<CharT, Traits> const& left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         size_t left_size = left.size();
         size_t right_size = right.size();
         return left_size == right_size &&
@@ -303,57 +325,67 @@ namespace std_utils {
     }
 
     template<typename CharT, class Traits>
-    bool operator!=(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator!=(lazy_basic_string<CharT, Traits> const& left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return !(left == right);
     }
 
     template<typename CharT, class Traits>
-    bool operator<(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
-        size_t left_size = left.size();
-        size_t right_size = right.size();
-        auto cmp_result = Traits::compare(left.c_str(), right.c_str(), std::min(left_size, right_size));
-        return cmp_result < 0 || (cmp_result == 0 && left_size < right_size);
+    bool operator<(lazy_basic_string<CharT, Traits> const& left, 
+            lazy_basic_string<CharT, Traits> const& right) {
+        size_t l_size = left.size();
+        size_t r_size = right.size();
+        auto cmp_res = Traits::compare(left.c_str(), right.c_str(), std::min(l_size, r_size));
+        return cmp_res < 0 || (cmp_res == 0 && l_size < r_size);
     }
 
     template<typename CharT, class Traits>
-    bool operator<=(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator<=(lazy_basic_string<CharT, Traits> const& left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return !(right < left);
     }
 
     template<typename CharT, class Traits>
-    bool operator>(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator>(lazy_basic_string<CharT, Traits> const& left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return right < left;
     }
 
     template<typename CharT, class Traits>
-    bool operator>=(lazy_basic_string<CharT, Traits> const& left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator>=(lazy_basic_string<CharT, Traits> const& left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return !(left < right);
     }
 
     template<typename CharT, class Traits>
-    bool operator==(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator==(typename lazy_basic_string<CharT, Traits>::const_pointer left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         auto left_size = Traits::length(left);
         return left_size == right.size() && Traits::compare(left, right.c_str(), left_size) == 0;
     }
 
     template<typename CharT, class Traits>
-    bool operator==(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
+    bool operator==(lazy_basic_string<CharT, Traits>const& left, 
+            typename lazy_basic_string<CharT, Traits>::const_pointer right) {
         auto right_size = Traits::length(right);
         return right_size == left.size() && Traits::compare(left.c_str(), right, right_size) == 0;
     }
 
     template<typename CharT, class Traits>
-    bool operator!=(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator!=(typename lazy_basic_string<CharT, Traits>::const_pointer left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return !(left == right);
     }
 
     template<typename CharT, class Traits>
-    bool operator!=(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
+    bool operator!=(lazy_basic_string<CharT, Traits>const& left, 
+            typename lazy_basic_string<CharT, Traits>::const_pointer right) {
         return !(left == right);
     }
 
     template<typename CharT, class Traits>
-    bool operator<(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator<(typename lazy_basic_string<CharT, Traits>::const_pointer left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         size_t left_size = Traits::length(left);
         size_t right_size = right.size();
         auto cmp_result = Traits::compare(left, right.c_str(), std::min(left_size, right_size));
@@ -361,7 +393,8 @@ namespace std_utils {
     }
 
     template<typename CharT, class Traits>
-    bool operator<(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
+    bool operator<(lazy_basic_string<CharT, Traits>const& left, 
+            typename lazy_basic_string<CharT, Traits>::const_pointer right) {
         size_t left_size = left.size();
         size_t right_size = Traits::length(right);
         auto cmp_result = Traits::compare(left.c_str(), right, std::min(left_size, right_size));
@@ -369,32 +402,38 @@ namespace std_utils {
     }
 
     template<typename CharT, class Traits>
-    bool operator<=(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator<=(typename lazy_basic_string<CharT, Traits>::const_pointer left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return !(right < left);
     }
 
     template<typename CharT, class Traits>
-    bool operator<=(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
+    bool operator<=(lazy_basic_string<CharT, Traits>const& left, 
+            typename lazy_basic_string<CharT, Traits>::const_pointer right) {
         return !(right < left);
     }
 
     template<typename CharT, class Traits>
-    bool operator>(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator>(typename lazy_basic_string<CharT, Traits>::const_pointer left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return right < left;
     }
 
     template<typename CharT, class Traits>
-    bool operator>(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
+    bool operator>(lazy_basic_string<CharT, Traits>const& left, 
+            typename lazy_basic_string<CharT, Traits>::const_pointer right) {
         return right < left;
     }
 
     template<typename CharT, class Traits>
-    bool operator>=(typename lazy_basic_string<CharT, Traits>::const_pointer left, lazy_basic_string<CharT, Traits> const& right) {
+    bool operator>=(typename lazy_basic_string<CharT, Traits>::const_pointer left, 
+            lazy_basic_string<CharT, Traits> const& right) {
         return !(left < right);
     }
 
     template<typename CharT, class Traits>
-    bool operator>=(lazy_basic_string<CharT, Traits>const& left, typename lazy_basic_string<CharT, Traits>::const_pointer right) {
+    bool operator>=(lazy_basic_string<CharT, Traits>const& left, 
+            typename lazy_basic_string<CharT, Traits>::const_pointer right) {
         return !(left < right);
     }
 
