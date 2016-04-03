@@ -172,12 +172,28 @@ void test_concat() {
     assert("abcd" == str1);
 }
 
+void test_bad_proxy() {
+    lazy_string str("abc");
+    auto good = [str]() { return str[0]; };
+    auto bad = []() { lazy_string str1("abc"); return str1[0]; };
+    auto std_example = []() {std::string str1("abc"); return str1[0]; };
+
+    auto good_proxy = good();
+    auto bad_proxy = bad();
+    auto std_proxy = std_example();
+
+    assert(static_cast<char>(good_proxy) == 'a');
+    assert(static_cast<char>(std_proxy) == 'a');
+    //assert(static_cast<char>(bad_proxy) == 'a');
+}
+
 void my_tests() {
     test_lazy();
 
     test_comparison();
     test_icomparison();
     test_concat();
+    test_bad_proxy();
 }
 
 int main() {
