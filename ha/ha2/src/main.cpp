@@ -50,6 +50,14 @@ void test_constructors() {
     lazy_string str2 = str1;
     assert(str_equal<lazy_string>(c_str, str1));
     assert(str_equal<lazy_string>(str1, str2));
+
+    lazy_string str3(10, 'a');
+    assert(str3[0] == 'a');
+    assert(str3.size() == 10);
+    
+    lazy_string str4(3);
+    assert(3 == str4.size());
+    assert(str4[2] == char());
 }
 
 void test_assignment_operator() {
@@ -141,13 +149,13 @@ void test_comparison() {
     assert("b" > lazy_string("a"));
     assert(lazy_string("b") > "a");
 
-    assert("c" > lazy_string('b', 1));
-    assert("b" < lazy_string('b', 2));
-    assert(lazy_string('c', 5) == "ccccc");
+    assert("c" > lazy_string(1, 'b'));
+    assert("b" < lazy_string(2, 'b'));
+    assert(lazy_string(5, 'c') == "ccccc");
 
     lazy_string str1('b', 5);
-    assert("aa" < lazy_string('b', 10));
-    assert("bbbb" < lazy_string('b', 5));
+    assert("aa" < lazy_string(10, 'b'));
+    assert("bbbb" < lazy_string(5, 'b'));
     assert("bbbb" <= lazy_string("bbbb"));
 }
 
@@ -174,13 +182,17 @@ void test_concat() {
 
 void test_bad_proxy() {
     lazy_string str("abc");
-    auto good = [str]() { return str[0]; };
+    auto good = [&str]() { return str[0]; };
     auto bad = []() { lazy_string str1("abc"); return str1[0]; };
     auto std_example = []() {std::string str1("abc"); return str1[0]; };
 
     auto good_proxy = good();
     auto bad_proxy = bad();
     auto std_proxy = std_example();
+
+    (void)std_proxy;
+    (void)bad_proxy;
+    (void)good_proxy;
 
     assert(static_cast<char>(good_proxy) == 'a');
     assert(static_cast<char>(std_proxy) == 'a');

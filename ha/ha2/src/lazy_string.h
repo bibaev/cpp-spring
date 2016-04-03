@@ -23,6 +23,8 @@ namespace std_utils {
             size_type index_;
         public:
             proxy(proxy const& other);
+            proxy& operator=(proxy const&) = delete;
+            ~proxy() = default;
             proxy(lazy_basic_string& ls, size_t index) : ls_(ls), index_(index) {}
             value_type operator=(value_type x) const {
                 ls_.set_at(x, index_);
@@ -40,7 +42,7 @@ namespace std_utils {
             explicit buffer(size_type size);
             explicit buffer(const_pointer c_str);
             buffer(const_pointer prefix, const_pointer suffix);
-            explicit buffer(value_type, size_type);
+            explicit buffer(size_type, value_type);
             buffer(buffer const& other) = default;
             ~buffer();
 
@@ -57,7 +59,7 @@ namespace std_utils {
         lazy_basic_string();
         lazy_basic_string(lazy_basic_string const& other);
         lazy_basic_string(const_pointer c_str);
-        lazy_basic_string(value_type ch, size_t count);
+        lazy_basic_string(size_t count, value_type ch = char());
 
         ~lazy_basic_string() = default;
 
@@ -127,8 +129,8 @@ namespace std_utils {
         data_[size_] = '\0';
     }
 
-    template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits>::buffer::buffer(value_type character, size_type count)
+    template<class CharT, class Traits>
+    lazy_basic_string<CharT, Traits>::buffer::buffer(size_type count, value_type character)
         : data_(new value_type[count + 1])
         , size_(count) {
         Traits::assign(data_, count, character);
@@ -174,9 +176,9 @@ namespace std_utils {
         : shared_buffer_(std::make_shared<buffer>(c_str))
     {}
 
-    template <class CharT, class Traits>
-    lazy_basic_string<CharT, Traits>::lazy_basic_string(value_type ch, size_t count)
-        : shared_buffer_(std::make_shared<buffer>(ch, count)) 
+    template<class CharT, class Traits>
+    lazy_basic_string<CharT, Traits>::lazy_basic_string(size_t count, value_type ch)
+        : shared_buffer_(std::make_shared<buffer>(count, ch)) 
     {}
 
     template <class CharT, class Traits>
@@ -209,7 +211,7 @@ namespace std_utils {
     template <class CharT, class Traits>
     lazy_basic_string<CharT, Traits> operator+(lazy_basic_string<CharT, Traits> left, 
             typename lazy_basic_string<CharT, Traits>::value_type ch) {
-        return left += lazy_basic_string<CharT, Traits>(ch, 1);
+        return left += lazy_basic_string<CharT, Traits>(1, ch);
     }
 
     template <class CharT, class Traits>
@@ -234,7 +236,7 @@ namespace std_utils {
     template <class CharT, class Traits>
     lazy_basic_string<CharT, Traits>& 
             lazy_basic_string<CharT, Traits>::operator+=(value_type ch) {
-        lazy_basic_string<CharT, Traits> other(ch, 1);
+        lazy_basic_string<CharT, Traits> other(1, ch);
         this->operator+=(other);
         return *this;
     }
@@ -304,7 +306,7 @@ namespace std_utils {
     lazy_basic_string<CharT, Traits> 
             operator+(typename lazy_basic_string<CharT, Traits>::const_reference left, 
                     lazy_basic_string<CharT, Traits>& right) {
-        return lazy_basic_string<CharT, Traits>(left, 1) += right;
+        return lazy_basic_string<CharT, Traits>(1, left) += right;
     }
 
     template<typename CharT, class Traits>
@@ -439,8 +441,8 @@ namespace std_utils {
     struct ichar_traits: std::char_traits<char> {
         static int compare(const char* left, const char* right, size_t count) {
             for (size_t i = 0; i < count; ++i) {
-                char l = tolower(left[i]);
-                char r = tolower(right[i]);
+                auto l = static_cast<char>(tolower(left[i]));
+                auto r = static_cast<char>(tolower(right[i]));
                 if(l != r) {
                     return l < r ? -1 : 1;
                 }
