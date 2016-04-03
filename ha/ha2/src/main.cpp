@@ -50,6 +50,14 @@ void test_constructors() {
     lazy_string str2 = str1;
     assert(str_equal<lazy_string>(c_str, str1));
     assert(str_equal<lazy_string>(str1, str2));
+
+    lazy_string str3(10, 'a');
+    assert(str3[0] == 'a');
+    assert(str3.size() == 10);
+    
+    lazy_string str4(3, 'a');
+    assert(3 == str4.size());
+    assert(str4[2] == 'a');
 }
 
 void test_assignment_operator() {
@@ -109,7 +117,13 @@ void test_swap() {
 void test_lazy_wstring() {
     lazy_wstring str1(L"Hell\xF6\x0A");
     lazy_wstring str2(L"Hell\xF6\x0A");
+    lazy_wstring str3(L"Hell\xF7\x0A");
     assert(str1 == str2);
+    assert(str1 != str3);
+    assert(str2 != str3);
+
+    str3[4] = L'\xF6';
+    assert(str1 == str3);
 }
 
 void test_lazy() {
@@ -126,6 +140,74 @@ void test_lazy() {
     assert(str1.use_count() == 2);
 }
 
+void test_comparison() {
+    assert("a" < lazy_string("b"));
+    assert(lazy_string("a") < lazy_string("b"));
+    assert("a" == lazy_string("a"));
+    assert(lazy_string("b") != "a");
+    assert(lazy_string("b") >= "a");
+    assert("b" > lazy_string("a"));
+    assert(lazy_string("b") > "a");
+
+    assert("c" > lazy_string(1, 'b'));
+    assert("b" < lazy_string(2, 'b'));
+    assert(lazy_string(5, 'c') == "ccccc");
+
+    lazy_string str1('b', 5);
+    assert("aa" < lazy_string(10, 'b'));
+    assert("bbbb" < lazy_string(5, 'b'));
+    assert("bbbb" <= lazy_string("bbbb"));
+}
+
+void test_icomparison() {
+    assert(lazy_istring("abc") == lazy_istring("abc"));
+    assert(lazy_istring("ABC") == lazy_istring("abc"));
+    assert(lazy_istring("AbCd") == "abcd");
+    assert(lazy_istring("ABC") <= lazy_istring("abc"));    
+}
+
+void test_concat() {
+    lazy_string str1("a");
+    assert(str1 + 'b' == "ab");
+    assert('b' + str1 == "ba");
+    assert("b" + str1 == "ba");
+    assert(str1 + "b" == "ab");
+    str1 += 'b';
+    assert("a" != str1);
+    assert("ab" == str1);
+    assert(str1 == "ab");
+    str1 += "cd";
+    assert("abcd" == str1);
+}
+
+void test_bad_proxy() {
+    lazy_string str("abc");
+    auto good = [&str]() { return str[0]; };
+    auto bad = []() { lazy_string str1("abc"); return str1[0]; };
+    auto std_example = []() {std::string str1("abc"); return str1[0]; };
+
+    auto good_proxy = good();
+    auto bad_proxy = bad();
+    auto std_proxy = std_example();
+
+    (void)std_proxy;
+    (void)bad_proxy;
+    (void)good_proxy;
+
+    assert(static_cast<char>(good_proxy) == 'a');
+    assert(static_cast<char>(std_proxy) == 'a');
+    //assert(static_cast<char>(bad_proxy) == 'a');
+}
+
+void my_tests() {
+    test_lazy();
+
+    test_comparison();
+    test_icomparison();
+    test_concat();
+    test_bad_proxy();
+}
+
 int main() {
     test_internal_typedefs();
     test_empty_string();
@@ -138,7 +220,7 @@ int main() {
     test_swap();
     test_lazy_wstring();
 
-    test_lazy();
+    my_tests();
 
     std::cout << "ok!" << std::endl;
     return 0;
