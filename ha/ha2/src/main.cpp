@@ -55,9 +55,9 @@ void test_constructors() {
     assert(str3[0] == 'a');
     assert(str3.size() == 10);
     
-    lazy_string str4(3);
+    lazy_string str4(3, 'a');
     assert(3 == str4.size());
-    assert(str4[2] == char());
+    assert(str4[2] == 'a');
 }
 
 void test_assignment_operator() {

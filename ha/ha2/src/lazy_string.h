@@ -59,7 +59,7 @@ namespace std_utils {
         lazy_basic_string();
         lazy_basic_string(lazy_basic_string const& other);
         lazy_basic_string(const_pointer c_str);
-        lazy_basic_string(size_t count, value_type ch = char());
+        lazy_basic_string(size_t count, value_type ch);
 
         ~lazy_basic_string() = default;
 
