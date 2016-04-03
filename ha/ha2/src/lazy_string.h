@@ -5,8 +5,6 @@
 #include <cctype>
 #include <memory>
 
-
-
 namespace std_utils {
     template<class CharT, class Traits = std::char_traits<CharT>>
     class lazy_basic_string {
@@ -54,6 +52,7 @@ namespace std_utils {
             pointer data_;
             size_type size_;
         }; // buffer  
+
     public:
         lazy_basic_string();
         lazy_basic_string(lazy_basic_string const& other);
