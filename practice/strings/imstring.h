@@ -6,6 +6,31 @@
 struct imstring;
 
 struct imstring {
+public:
+    struct iterator : std::iterator<std::bidirectional_iterator_tag, char>{
+        // all categories
+        iterator(iterator const& other);
+        iterator& operator=(iterator const& other);
+
+        iterator& operator++();
+        iterator  operator++(int);
+
+        // input iterator
+        // TODO: move out-scope
+        bool operator==(iterator const& other);
+        bool operator!=(iterator const& other);
+
+        char operator*();
+        char* operator->();
+
+        // forward iterator
+        iterator();
+
+        // bidirectional iterator
+        iterator& operator--();
+        iterator  operator--(int);
+    };
+
 private:
     struct buffer {
         buffer(std::string const& value);

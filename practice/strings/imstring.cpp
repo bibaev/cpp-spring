@@ -139,7 +139,7 @@ imstring operator+(imstring left, imstring const& right) {
 }
 
 std::ostream& operator<<(std::ostream& stream, imstring const& imstring) {
-    // TODO: make more lazy 
-    stream << imstring.c_str();
+    // TODO: make more lazy
+    stream << imstring;
     return stream;
 }
