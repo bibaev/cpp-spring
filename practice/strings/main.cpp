@@ -18,6 +18,16 @@ void test_strings_equal(STR1& str1, STR2 &str2)
     assert(strcmp(str1.c_str(), str2.c_str()) == 0);
 }
 
+void my_tests() {
+    std::string str("abc");
+
+    auto it = str.begin();
+    ++it;
+    assert(*it == 'b');
+    --it;
+    assert(*it == 'a');
+}
+
 int main()
 {
     std::string str1("foo bar buzz");
@@ -45,6 +55,8 @@ int main()
         str1 + str1 + str_concat1;
     test_strings_equal(str_concat2, imstr_concat2);
     test_strings_equal(imstr_concat2, str_concat2);
+
+    my_tests();
 
     return 0;
 }
