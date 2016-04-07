@@ -89,25 +89,25 @@ static void test_nonpod_vector_serialization() {
     assert(eq_container(v, v2));
 }
 
-//static void test_nonpod_map_serialization() {
-//    using namespace std;
-//    using namespace serialization;
-//    std::stringstream stream;
-//    std::ostream &os = stream;
-//    std::istream &is = stream;
-//
-//    std::map<string, int> v;
-//    v["1"] = 1;
-//    v["2"] = 2;
-//    v["3"] = 3;
-//    v["4"] = 4;
-//    serialize(os, v);
-//
-//    map<string, int> v2;
-//    deserialize(is, v2);
-//
-//    assert(eq_container(v, v2));
-//}
+static void test_nonpod_map_serialization() {
+    using namespace std;
+    using namespace serialization;
+    std::stringstream stream;
+    std::ostream &os = stream;
+    std::istream &is = stream;
+
+    std::map<string, int> v;
+    v["1"] = 1;
+    v["2"] = 2;
+    v["3"] = 3;
+    v["4"] = 4;
+    serialize(os, v);
+
+    map<string, int> v2;
+    deserialize(is, v2);
+
+    assert(eq_container(v, v2));
+}
 //
 //struct custom_record {
 //    custom_record()
