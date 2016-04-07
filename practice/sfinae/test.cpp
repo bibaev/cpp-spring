@@ -69,26 +69,26 @@ static void test_pod_vector_serialization() {
     assert(eq_container(v, v2));
 }
 
-//static void test_nonpod_vector_serialization() {
-//    using namespace std;
-//    using namespace serialization;
-//    std::stringstream stream;
-//    std::ostream &os = stream;
-//    std::istream &is = stream;
-//
-//    std::vector<string> v;
-//    v.push_back("1");
-//    v.push_back("2");
-//    v.push_back("3");
-//    v.push_back("4");
-//    serialize(os, v);
-//
-//    vector<string> v2;
-//    deserialize(is, v2);
-//
-//    assert(eq_container(v, v2));
-//}
-//
+static void test_nonpod_vector_serialization() {
+    using namespace std;
+    using namespace serialization;
+    std::stringstream stream;
+    std::ostream &os = stream;
+    std::istream &is = stream;
+
+    std::vector<string> v;
+    v.push_back("1");
+    v.push_back("2");
+    v.push_back("3");
+    v.push_back("4");
+    serialize(os, v);
+
+    vector<string> v2;
+    deserialize(is, v2);
+
+    assert(eq_container(v, v2));
+}
+
 //static void test_nonpod_map_serialization() {
 //    using namespace std;
 //    using namespace serialization;
@@ -165,7 +165,7 @@ int main() {
     // Task 2
     test_pod_vector_serialization();
     //// Task 3
-    //test_nonpod_vector_serialization();
+    test_nonpod_vector_serialization();
     //// Task 4
     //test_nonpod_map_serialization();
     //// Task 5
