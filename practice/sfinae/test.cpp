@@ -1,8 +1,6 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <set>
-#include <list>
 
 #include <assert.h>
 #include <sstream>
@@ -108,7 +106,7 @@ static void test_nonpod_map_serialization() {
 
     assert(eq_container(v, v2));
 }
-//
+
 //struct custom_record {
 //    custom_record()
 //        : number(0) {
