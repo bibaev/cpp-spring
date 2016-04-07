@@ -60,6 +60,7 @@ static void test_pod_vector_serialization() {
     v.push_back(2);
     v.push_back(3);
     v.push_back(4);
+    v.insert(v.end(), 5);
     serialize(os, v);
 
     vector<int> v2;
@@ -67,7 +68,7 @@ static void test_pod_vector_serialization() {
 
     assert(eq_container(v, v2));
 }
-//
+
 //static void test_nonpod_vector_serialization() {
 //    using namespace std;
 //    using namespace serialization;
