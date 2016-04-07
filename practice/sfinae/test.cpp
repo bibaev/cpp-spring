@@ -32,6 +32,11 @@ static void test_pod_serialization() {
         size_t b;
         unsigned bit : 1;
     };
+
+    map<int, int> not_pod;
+
+    //serialize(not_pod);
+
     mypod_t mypod = { 1, 2, 0 };
     serialize(os, mypod);
 
@@ -62,108 +67,108 @@ static void test_pod_vector_serialization() {
 
     assert(eq_container(v, v2));
 }
-
-static void test_nonpod_vector_serialization() {
-    using namespace std;
-    using namespace serialization;
-    std::stringstream stream;
-    std::ostream &os = stream;
-    std::istream &is = stream;
-
-    std::vector<string> v;
-    v.push_back("1");
-    v.push_back("2");
-    v.push_back("3");
-    v.push_back("4");
-    serialize(os, v);
-
-    vector<string> v2;
-    deserialize(is, v2);
-
-    assert(eq_container(v, v2));
-}
-
-static void test_nonpod_map_serialization() {
-    using namespace std;
-    using namespace serialization;
-    std::stringstream stream;
-    std::ostream &os = stream;
-    std::istream &is = stream;
-
-    std::map<string, int> v;
-    v["1"] = 1;
-    v["2"] = 2;
-    v["3"] = 3;
-    v["4"] = 4;
-    serialize(os, v);
-
-    map<string, int> v2;
-    deserialize(is, v2);
-
-    assert(eq_container(v, v2));
-}
-
-struct custom_record {
-    custom_record()
-        : number(0) {
-    }
-
-    custom_record(std::string const& t, int n)
-        : text(t)
-        , number(n)
-        , texts(n, t) {
-    }
-
-    template<class stream>
-    friend void serialize(stream& s, custom_record& r) {
-        serialization::serialize(s, r.text);
-        serialization::serialize(s, r.number);
-        serialization::serialize(s, r.texts);
-    }
-
-    friend bool operator==(custom_record const& lhs,
-        custom_record const& rhs) {
-        return lhs.text == rhs.text
-            && lhs.number == rhs.number
-            && eq_container(lhs.texts, rhs.texts);
-    }
-private:
-    std::string text;
-    int number;
-    std::vector<std::string> texts;
-};
-
-static void test_custom_struct_serialization() {
-    using namespace std;
-    using namespace serialization;
-    std::stringstream stream;
-    std::ostream &os = stream;
-    std::istream &is = stream;
-
-    list<custom_record> v;
-    v.push_back(custom_record("1", 1));
-    v.push_back(custom_record("2", 2));
-    v.push_back(custom_record("3", 3));
-    v.push_back(custom_record("4", 4));
-    serialize(os, v);
-
-    list<custom_record> v2;
-    deserialize(is, v2);
-
-    assert(eq_container(v, v2));
-}
+//
+//static void test_nonpod_vector_serialization() {
+//    using namespace std;
+//    using namespace serialization;
+//    std::stringstream stream;
+//    std::ostream &os = stream;
+//    std::istream &is = stream;
+//
+//    std::vector<string> v;
+//    v.push_back("1");
+//    v.push_back("2");
+//    v.push_back("3");
+//    v.push_back("4");
+//    serialize(os, v);
+//
+//    vector<string> v2;
+//    deserialize(is, v2);
+//
+//    assert(eq_container(v, v2));
+//}
+//
+//static void test_nonpod_map_serialization() {
+//    using namespace std;
+//    using namespace serialization;
+//    std::stringstream stream;
+//    std::ostream &os = stream;
+//    std::istream &is = stream;
+//
+//    std::map<string, int> v;
+//    v["1"] = 1;
+//    v["2"] = 2;
+//    v["3"] = 3;
+//    v["4"] = 4;
+//    serialize(os, v);
+//
+//    map<string, int> v2;
+//    deserialize(is, v2);
+//
+//    assert(eq_container(v, v2));
+//}
+//
+//struct custom_record {
+//    custom_record()
+//        : number(0) {
+//    }
+//
+//    custom_record(std::string const& t, int n)
+//        : text(t)
+//        , number(n)
+//        , texts(n, t) {
+//    }
+//
+//    template<class stream>
+//    friend void serialize(stream& s, custom_record& r) {
+//        serialization::serialize(s, r.text);
+//        serialization::serialize(s, r.number);
+//        serialization::serialize(s, r.texts);
+//    }
+//
+//    friend bool operator==(custom_record const& lhs,
+//        custom_record const& rhs) {
+//        return lhs.text == rhs.text
+//            && lhs.number == rhs.number
+//            && eq_container(lhs.texts, rhs.texts);
+//    }
+//private:
+//    std::string text;
+//    int number;
+//    std::vector<std::string> texts;
+//};
+//
+//static void test_custom_struct_serialization() {
+//    using namespace std;
+//    using namespace serialization;
+//    std::stringstream stream;
+//    std::ostream &os = stream;
+//    std::istream &is = stream;
+//
+//    list<custom_record> v;
+//    v.push_back(custom_record("1", 1));
+//    v.push_back(custom_record("2", 2));
+//    v.push_back(custom_record("3", 3));
+//    v.push_back(custom_record("4", 4));
+//    serialize(os, v);
+//
+//    list<custom_record> v2;
+//    deserialize(is, v2);
+//
+//    assert(eq_container(v, v2));
+//}
 
 int main() {
     // Task 1
     test_pod_serialization();
     // Task 2
     test_pod_vector_serialization();
-    // Task 3
-    test_nonpod_vector_serialization();
-    // Task 4
-    test_nonpod_map_serialization();
-    // Task 5
-    test_custom_struct_serialization();
+    //// Task 3
+    //test_nonpod_vector_serialization();
+    //// Task 4
+    //test_nonpod_map_serialization();
+    //// Task 5
+    //test_custom_struct_serialization();
 
     return 0;
 }
