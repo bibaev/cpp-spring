@@ -37,7 +37,13 @@ namespace serialization
 
         template<class field_type>
         void operator()(field_type& value, const char* key) {
-            read(json_.mapping_[std::string(key)], value);
+            std::string key_str(key);
+            if(json_.mapping_.count(key_str) == 0) {
+                value = field_type();
+            }
+            else {
+                read(json_.mapping_[std::string(key)], value);
+            }
         }
 
     private:
