@@ -13,5 +13,10 @@ namespace serialization
         std::string value_;
         std::map<std::string, json_value_t> mapping_;
     };
+
+    template<class type>
+    void write(json_value_t& jvalue, type& obj) {
+        
+    }
     // TODO
 } // serialization

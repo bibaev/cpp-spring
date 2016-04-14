@@ -8,8 +8,8 @@
 #include "binary_serialization.h"
 #include "json_serialization.h"
 
-//#define TEST_BIN_SERIALIZATION
-//#define TEST_JSON_SERIALIZATION
+#define TEST_BIN_SERIALIZATION
+#define TEST_JSON_SERIALIZATION
 
 // === binary serialization tests ===
 struct pod_struct
