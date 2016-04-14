@@ -37,7 +37,7 @@ namespace serialization
 
         template<class field_type>
         void operator()(field_type& value, const char* key) {
-            // TODO:
+            read(json_.mapping_[std::string(key)], value);
         }
 
     private:
@@ -59,12 +59,15 @@ namespace serialization
 
     template<class type>
     typename std::enable_if<std::is_arithmetic<type>::value>::type read(json_value_t& jvalue, type& obj) {
-
+        type val;
+        std::stringstream ss;
+        ss << jvalue.value_;
+        ss >> obj;
     }
 
     template<class type>
     typename std::enable_if<!std::is_arithmetic<type>::value>::type read(json_value_t& jvalue, type& obj) {
-        
+        json_reader_t proc(jvalue);
+        reflect_type(proc, obj);
     }
-    // TODO
 } // serialization
