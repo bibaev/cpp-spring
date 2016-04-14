@@ -59,7 +59,6 @@ namespace serialization
 
     template<class type>
     typename std::enable_if<std::is_arithmetic<type>::value>::type read(json_value_t& jvalue, type& obj) {
-        type val;
         std::stringstream ss;
         ss << jvalue.value_;
         ss >> obj;

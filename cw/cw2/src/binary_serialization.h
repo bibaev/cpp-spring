@@ -2,8 +2,19 @@
 #include <type_traits>
 namespace serialization
 {
-    // Task 1.
+    template<class type>
+    typename std::enable_if<std::is_pod<type>::value>::type write(std::ostream& os, type& obj);
 
+    template<class type>
+    typename std::enable_if<std::is_pod<type>::value>::type read(std::istream& is, type& obj);
+
+    template<class type>
+    typename std::enable_if<!std::is_pod<type>::value>::type read(std::istream& is, type& obj); 
+
+    template<class type>
+    typename std::enable_if<!std::is_pod<type>::value>::type write(std::ostream& os, type& obj);
+
+    // Task 1.
     struct iserializer_t {
         iserializer_t(std::istream& is)
             : stream(is) {
@@ -45,7 +56,9 @@ namespace serialization
     template<class type>
     typename std::enable_if<std::is_pod<type>::value>::type read(std::istream& is, type& obj) {
         is.read(reinterpret_cast<char*>(&obj), sizeof(type));
-    }    template<class type>
+    }
+
+    template<class type>
     typename std::enable_if<!std::is_pod<type>::value>::type read(std::istream& is, type& obj) {
         iserializer_t proc(is);
         reflect_type(proc, obj);
