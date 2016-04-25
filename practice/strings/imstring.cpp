@@ -9,7 +9,13 @@ imstring::iterator::iterator(std::shared_ptr<buffer> buffer)
 }
 
 imstring::iterator& imstring::iterator::operator++() {
-    
+    // TODO: implement
+}
+
+imstring::iterator imstring::iterator::operator++(int) {
+    auto copy(*this);
+    this->operator++();
+    return copy;
 }
 
 imstring::buffer::buffer(std::string const& value)
@@ -24,7 +30,7 @@ imstring::buffer::buffer(std::shared_ptr<buffer> left, std::shared_ptr<buffer> r
     , value_("")
     , left_(left)
     , right_(right)
-{}
+{} 
 
 size_t imstring::buffer::size() const {
     if(is_concat_) {
@@ -104,6 +110,14 @@ size_t imstring::buffer::add_primitive_buffers(std::vector<std::shared_ptr<buffe
     return total_size;
 }
 
+imstring::iterator::iterator()
+    : root_(nullptr)
+    , current_node_(nullptr)
+    , current_pos_(std::string::iterator())
+    , end_pos_(std::string::iterator())
+    , stack_()
+{}
+
 bool imstring::iterator::to_next_value() {
     if (current_pos_ == end_pos_) {
         return false;
@@ -116,7 +130,11 @@ bool imstring::iterator::to_next_value() {
         }
 
         current_pos_ = current_node_->value_.begin();
+        current_end_ = current_node_->value_.end();
+        return true;
     }
+
+
 
     // TODO: Complete method.
 }
@@ -173,6 +191,10 @@ std::string::iterator imstring::end() const {
 
 imstring::iterator imstring::_begin() const {
     return iterator(shared_buffer_);
+}
+
+imstring::iterator imstring::_end() const {
+    return iterator();
 }
 
 imstring operator+(imstring left, imstring const& right) {

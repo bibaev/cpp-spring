@@ -60,11 +60,13 @@ public:
 
     private:
         bool to_next_value();
+        bool to_prev_value();
         void eval_end();
         std::shared_ptr<buffer> root_;
 
         std::shared_ptr<buffer> current_node_;
         std::string::iterator current_pos_;
+        std::string::iterator current_end_;
         std::string::iterator end_pos_;
 
         std::stack<std::shared_ptr<buffer>> stack_;
