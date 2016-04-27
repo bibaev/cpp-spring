@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 
-//#define ENABLE
+#define ENABLE
 
 #if defined(ENABLE)
 #include <memory>

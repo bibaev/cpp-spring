@@ -1,7 +1,7 @@
 #include <iostream>
 
 
-//#define ENABLE
+#define ENABLE
 
 #if defined(ENABLE)
 #include <cassert>
@@ -14,7 +14,7 @@ static bool post_increment_global_var(int amount=1)
 {
     int old_val = global_var;
     global_var += amount;
-    return old_val;
+    return old_val != 0;
 }
 
 static void test_1_arg_func_bind()
@@ -159,7 +159,6 @@ static void test_binder_move_constructor()
 
 static void test_binder_copy_constructor()
 {
-
     auto src = bind(take_first, 1, _1);
     auto copy(src);
     assert(src(2) == copy(2));
@@ -169,12 +168,12 @@ static void test_assignment()
 {
     /* There is no assignment in standard bind. */
     /* So ignore this task. */
-    /*auto inst1 = bind(take_first, 1, _1);
+    auto inst1 = bind(take_first, 1, _1);
     auto inst2 = bind(take_second, 2, _1);
     assert(inst1(2) == 1);
     assert(inst2(1) == 1);
     inst2 = inst1;
-    assert(inst1(2) == 1);*/
+    assert(inst1(2) == 1);
 }
 
 int bind_tests_start()
