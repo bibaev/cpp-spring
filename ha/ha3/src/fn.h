@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <memory>
 #include <tuple>
+#include <cstddef>
 
 namespace fn {
     namespace inner {
