@@ -6,6 +6,22 @@
 
 namespace fn {
     namespace inner {
+        template <typename T, T... I>
+        struct integer_sequence {
+        };
+
+        template <size_t... I>
+        struct index_sequence : integer_sequence<size_t, I...> {};
+
+        template <size_t N, size_t... I>
+        struct build_index_impl : build_index_impl<N - 1, N - 1, I...> {};
+
+        template <size_t... I>
+        struct build_index_impl<0, I...> : index_sequence<I...> {};
+
+        template <typename... Ts>
+        struct index_sequence_for : build_index_impl<sizeof...(Ts)> {};
+
         template<size_t N>
         struct placeholder {};
 
@@ -36,8 +52,8 @@ namespace fn {
         // binded argument specialization
         template<typename ARG>
         struct tuple_type_extractor<ARG, false> {
-            template<typename _ARG, typename TUPLE>
-            auto get(_ARG && arg, TUPLE const& tuple) ->_ARG&& {
+            template<typename ARGUMENT, typename TUPLE>
+            auto get(ARGUMENT && arg, TUPLE const& tuple)->ARGUMENT&& {
                 return arg;
             }
         };
@@ -66,18 +82,16 @@ namespace fn {
                 , binded_args_(std::move(other.binded_args_)) {
             }
 
-            template<typename... ARGS>
-            auto operator()(ARGS&&... args) {
-                using RES = 
-                    decltype(std::declval<FUN>()(tuple_type_extractor<BINDED_ARGS>()
-                        .get(std::declval<BINDED_ARGS&>(),std::declval<std::tuple<ARGS...>&>())...));
+            template<typename... ARGS, typename RES = decltype(std::declval<FUN>()(tuple_type_extractor<BINDED_ARGS>()
+                .get(std::declval<BINDED_ARGS&>(), std::declval<std::tuple<ARGS...>&>())...))>
+                auto operator()(ARGS&&... args) -> RES {
                 return invoke<RES>(std::forward_as_tuple(std::forward<ARGS>(args)...),
-                    std::index_sequence_for<BINDED_ARGS...>());
+                    index_sequence_for<BINDED_ARGS...>());
             }
 
         private:
             template<typename RES, typename... ARGS, size_t... INDICES>
-            RES invoke(std::tuple<ARGS...> && args, std::index_sequence<INDICES...>) {
+            RES invoke(std::tuple<ARGS...> && args, index_sequence<INDICES...>) {
                 return function_(tuple_type_extractor<BINDED_ARGS>()
                     .get(std::get<INDICES>(binded_args_), args)...);
             }
@@ -96,14 +110,15 @@ namespace fn {
     const inner::placeholder<7> _7{};
 
     template<typename FUN, typename... ARGS>
-    auto bind(FUN function, ARGS&& ... args) {
-        return inner::binder<FUN(typename std::decay<ARGS>::type...)>(function, std::forward<ARGS>(args)... );
+    auto bind(FUN function, ARGS&& ... args) -> decltype(inner::binder<FUN(typename std::decay<ARGS>::type...)>(function, std::forward<ARGS>(args)...)) {
+        return inner::binder<FUN(typename std::decay<ARGS>::type...)>(function, std::forward<ARGS>(args)...);
     }
 
     // function
     struct bad_function_call : std::runtime_error {
         explicit bad_function_call(std::string const& message)
-            : runtime_error(message) {}
+            : runtime_error(message) {
+        }
     };
 
     template<typename>
@@ -119,7 +134,7 @@ namespace fn {
         template<typename F>
         function(F fun) : invoker_(new invoker<F>(fun)) {}
 
-        function& operator=(function other) { 
+        function& operator=(function other) {
             swap(other); return *this;
         }
 
@@ -128,15 +143,15 @@ namespace fn {
         }
 
         RES operator()(ARGS ... args) const {
-            if(invoker_ == nullptr) {
+            if (invoker_ == nullptr) {
                 throw bad_function_call("function object is empty");
             }
 
             return invoker_->operator()(std::forward<ARGS>(args)...);
         }
 
-        operator bool() const { 
-            return invoker_ != nullptr; 
+        operator bool() const {
+            return invoker_ != nullptr;
         }
 
     private:
@@ -152,13 +167,14 @@ namespace fn {
             FUN function_;
         public:
             explicit invoker(FUN function)
-                : function_(function) {}
+                : function_(function) {
+            }
 
             invoker_base* clone() override {
                 return new invoker(function_);
             }
 
-            RES operator()(ARGS ... args) override { 
+            RES operator()(ARGS ... args) override {
                 return function_(args...);
             }
         };

@@ -6,7 +6,7 @@ OBJS = $(BIN)main.o \
 	$(BIN)function_tests.o \
 	$(BIN)my_tests.o
 TARGET = ./bin/bind_function
-CXXFLAGS = -std=c++1y -Wall -Werror -g -O2
+CXXFLAGS = -std=c++11 -Wall -Werror -g 
 
 all: bin build
 

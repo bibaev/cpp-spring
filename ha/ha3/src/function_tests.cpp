@@ -14,84 +14,69 @@
 
 //#define USE_STD
 #if !defined(USE_STD)
-    namespace n = fn;
+namespace n = fn;
 #else
-    namespace n = std;
+namespace n = std;
 #endif
 
 size_t res;
 std::string res_str;
 
-struct Func
-{
-    size_t operator() ()
-    {
+struct Func {
+    size_t operator() () {
         res = 70;
         return res;
     }
 };
 
-struct ConstFunc
-{
-    size_t operator() () const
-    {
+struct ConstFunc {
+    size_t operator() () const {
         res = 71;
         return res;
     }
 };
 
-void void_f_void()
-{
+void void_f_void() {
     res = 10;
 }
 
-int int_f_void()
-{
+int int_f_void() {
     return 11;
 }
 
-std::string string_f_void()
-{
+std::string string_f_void() {
     return "string_f_void";
 }
 
-int const const_int_f_void()
-{
+int const const_int_f_void() {
     return 31;
 }
 
-std::string const string_const_f_void()
-{
+std::string const string_const_f_void() {
     return "string_const_f_void";
 }
 
-void * void_ptr_f_void()
-{
+void * void_ptr_f_void() {
     return reinterpret_cast<void *>(20);
 }
 
-int * int_ptr_f_void()
-{
+int * int_ptr_f_void() {
     return reinterpret_cast<int *>(21);
 }
 
-std::string * string_ptr_f_void()
-{
+std::string * string_ptr_f_void() {
     return reinterpret_cast<std::string *>(22);
 }
 
-std::string const * const string_const_ptr_const_f_void()
-{
+std::string const * const string_const_ptr_const_f_void() {
     return reinterpret_cast<std::string *>(52);
 }
 
-std::string & string_ref_f_void()
-{
+std::string & string_ref_f_void() {
     return res_str;
 }
 
-std::string const & string_const_ref_f_void()
-{
+std::string const & string_const_ref_f_void() {
     return res_str;
 }
 
@@ -99,7 +84,7 @@ int global_int;
 
 struct write_five_obj { void operator()() const { global_int = 5; } };
 // TODO: changed return type from 'int' to 'void' 
-struct write_three_obj { void operator()() const { global_int = 3; /*return 7; */}}; 
+struct write_three_obj { void operator()() const { global_int = 3; /*return 7; */ } };
 static void write_five() { global_int = 5; }
 static void write_three() { global_int = 3; }
 struct generate_five_obj { int operator()() const { return 5; } };
@@ -107,17 +92,15 @@ struct generate_three_obj { int operator()() const { return 3; } };
 static int generate_five() { return 5; }
 static int generate_three() { return 3; }
 static std::string identity_str(const std::string& s) { return s; }
-static std::string string_cat(const std::string& s1, const std::string& s2) { return s1+s2; }
-static int sum_ints(int x, int y) { return x+y; }
+static std::string string_cat(const std::string& s1, const std::string& s2) { return s1 + s2; }
+static int sum_ints(int x, int y) { return x + y; }
 
-struct write_const_1_nonconst_2
-{
+struct write_const_1_nonconst_2 {
     void operator()() { global_int = 2; }
     void operator()() const { global_int = 1; }
 };
 
-struct add_to_obj
-{
+struct add_to_obj {
     add_to_obj(int v) : value(v) {}
 
     int operator()(int x) const { return value + x; }
@@ -126,9 +109,8 @@ struct add_to_obj
 };
 
 static void
-test_zero_args()
-{
-    typedef n::function<void ()> func_void_type;
+test_zero_args() {
+    typedef n::function<void()> func_void_type;
 
     write_five_obj five;
     write_three_obj three;
@@ -552,8 +534,8 @@ test_zero_args()
 
     // Const vs. non-const
     write_const_1_nonconst_2 one_or_two;
-    const n::function<void ()> v7(one_or_two);
-    n::function<void ()> v8(one_or_two);
+    const n::function<void()> v7(one_or_two);
+    n::function<void()> v8(one_or_two);
 
     global_int = 0;
     v7();
@@ -568,7 +550,7 @@ test_zero_args()
     assert(!v9);
 
     // Test return values
-    typedef n::function<int ()> func_int_type;
+    typedef n::function<int()> func_int_type;
     generate_five_obj gen_five;
     generate_three_obj gen_three;
 
@@ -586,7 +568,7 @@ test_zero_args()
     assert(!i0 ? true : false);
 
     // Test return values with compatible types
-    typedef n::function<long ()> func_long_type;
+    typedef n::function<long()> func_long_type;
     func_long_type i1(gen_five);
 
     assert(i1() == 5);
@@ -596,96 +578,89 @@ test_zero_args()
     assert(i1() == 5);
     i1 = &generate_three;
     assert(i1() == 3);
-    assert(i1? true : false);
+    assert(i1 ? true : false);
 
-// doesn't work in MSVC2010
-//     i1 = func_int_type();
-//     assert(!i1? true : false);
+    // doesn't work in MSVC2010
+    //     i1 = func_int_type();
+    //     assert(!i1? true : false);
 }
 
 static void
-test_one_arg()
-{
+test_one_arg() {
     std::negate<int> neg;
 
-    n::function<int (int)> f1(neg);
+    n::function<int(int)> f1(neg);
     assert(f1(5) == -5);
 
-    n::function<std::string (std::string)> id(&identity_str);
+    n::function<std::string(std::string)> id(&identity_str);
     assert(id("str") == "str");
 
-    n::function<std::string (const char*)> id2(&identity_str);
+    n::function<std::string(const char*)> id2(&identity_str);
     assert(id2("foo") == "foo");
 
     add_to_obj add_to(5);
-    n::function<int (int)> f2(add_to);
+    n::function<int(int)> f2(add_to);
     assert(f2(3) == 8);
 
-    const n::function<int (int)> cf2(add_to);
+    const n::function<int(int)> cf2(add_to);
     assert(cf2(3) == 8);
 }
 
 static void
-test_two_args()
-{
-    n::function<std::string (const std::string&, const std::string&)> cat(&string_cat);
+test_two_args() {
+    n::function<std::string(const std::string&, const std::string&)> cat(&string_cat);
     assert(cat("str", "ing") == "string");
 
-    n::function<int (short, short)> sum(&sum_ints);
+    n::function<int(short, short)> sum(&sum_ints);
     assert(sum(2, 3) == 5);
 }
 
 static void
-test_emptiness()
-{
-    n::function<float ()> f1;
+test_emptiness() {
+    n::function<float()> f1;
     assert(!f1);
 
-    n::function<float ()> f2;
+    n::function<float()> f2;
     f2 = f1;
     assert(!f2);
 
-// doesn't work in MSVC2010
+    // doesn't work in MSVC2010
 
-//     n::function<double ()> f3;
-//     f3 = f2;
-//     assert(!f3);
+    //     n::function<double ()> f3;
+    //     f3 = f2;
+    //     assert(!f3);
 }
 
 struct add_with_throw_on_copy {
-    int operator()(int x, int y) const { return x+y; }
+    int operator()(int x, int y) const { return x + y; }
 
     add_with_throw_on_copy() {}
 
-    add_with_throw_on_copy(const add_with_throw_on_copy&)
-    {
+    add_with_throw_on_copy(const add_with_throw_on_copy&) {
         throw std::runtime_error("But this CAN'T throw");
     }
 
-    add_with_throw_on_copy& operator=(const add_with_throw_on_copy&)
-    {
+    add_with_throw_on_copy& operator=(const add_with_throw_on_copy&) {
         throw std::runtime_error("But this CAN'T throw");
     }
 };
 
 static void
-test_ref()
-{
+test_ref() {
     add_with_throw_on_copy atc;
     try {
         // TODO:
-//         n::function<int (int, int)> f(std::ref(atc));
-//         assert(f(1, 3) == 4);
+        //         n::function<int (int, int)> f(std::ref(atc));
+        //         assert(f(1, 3) == 4);
     }
-    catch(std::runtime_error e) {
+    catch (std::runtime_error e) {
         assert(!"Nonthrowing constructor threw an exception");
     }
 }
 
 static void dummy() {}
 
-static void test_empty_ref()
-{
+static void test_empty_ref() {
     n::function<void()> f1;
     n::function<void()> f2(std::ref(f1));
 
@@ -693,8 +668,7 @@ static void test_empty_ref()
         f2();
         assert(!"Exception didn't throw for reference to empty function.");
     }
-    catch(n::bad_function_call const&) 
-    {
+    catch (n::bad_function_call const&) {
     }
 
     f1 = dummy;
@@ -702,20 +676,19 @@ static void test_empty_ref()
     try {
         f2();
     }
-    catch(std::bad_function_call e) {
+    catch (std::bad_function_call e) {
         assert(!"Error calling referenced function.");
     }
 }
 
 
-static void test_exception()
-{
-    n::function<int (int, int)> f;
+static void test_exception() {
+    n::function<int(int, int)> f;
     try {
         f(5, 4);
         assert(false);
     }
-    catch(n::bad_function_call) {
+    catch (n::bad_function_call) {
         // okay
     }
 }
@@ -723,61 +696,50 @@ static void test_exception()
 typedef n::function< void * (void * reader) > reader_type;
 typedef std::pair<int, reader_type> mapped_type;
 
-static void test_implicit()
-{
+static void test_implicit() {
     mapped_type m;
     m = mapped_type();
 }
 
-static void test_call_obj(n::function<int (int, int)> f)
-{
+static void test_call_obj(n::function<int(int, int)> f) {
     assert(f);
 }
 
-static void test_call_cref(const n::function<int (int, int)>& f)
-{
+static void test_call_cref(const n::function<int(int, int)>& f) {
     assert(f);
 }
 
-static void test_call()
-{
+static void test_call() {
     test_call_obj(std::plus<int>());
     test_call_cref(std::plus<int>());
 }
 
-struct big_aggregating_structure
-{
+struct big_aggregating_structure {
     int disable_small_objects_optimizations[32];
 
-    big_aggregating_structure()
-    {
+    big_aggregating_structure() {
         ++global_int;
     }
 
-    big_aggregating_structure(const big_aggregating_structure&)
-    {
+    big_aggregating_structure(const big_aggregating_structure&) {
         ++global_int;
     }
 
-    ~big_aggregating_structure()
-    {
+    ~big_aggregating_structure() {
         --global_int;
     }
 
-    void operator()()
-    {
+    void operator()() {
         ++global_int;
     }
 
-    void operator()(int)
-    {
+    void operator()(int) {
         ++global_int;
     }
 };
 
 template <class FunctionT>
-static void test_move_semantics()
-{
+static void test_move_semantics() {
     typedef FunctionT f1_type;
 
     big_aggregating_structure obj;
@@ -832,8 +794,7 @@ static void test_move_semantics()
     assert(global_int == 4);
 }
 
-int function_tests_start()
-{
+int function_tests_start() {
     // Function
 
     {
@@ -913,12 +874,12 @@ int function_tests_start()
         assert(&f11() == &res_str);
 
         Func F12;
-        n::function<size_t ()> f12(F12);
+        n::function<size_t()> f12(F12);
         assert(f12() == 70);
 
         ConstFunc F13;
-        n::function<size_t ()> f13(F13);
-        static_assert(std::is_same<std::result_of<n::function<size_t ()>()>::type, size_t>::value, "");
+        n::function<size_t()> f13(F13);
+        static_assert(std::is_same<std::result_of<n::function<size_t()>()>::type, size_t>::value, "");
         assert(f13() == 71);
 
         n::function<int()> f14(f2);
@@ -940,25 +901,21 @@ int function_tests_start()
         // Calling empty function
 
         bool raised = false;
-        try
-        {
+        try {
             n::function<void(int)> bad_func;
             bad_func(5);
         }
-        catch (n::bad_function_call const &)
-        {
+        catch (n::bad_function_call const &) {
             raised = true;
         }
         assert(raised);
 
         raised = false;
-        try
-        {
+        try {
             n::function<void(int)> bad_func(nullptr);
             bad_func(6);
         }
-        catch (n::bad_function_call const &)
-        {
+        catch (n::bad_function_call const &) {
             raised = true;
         }
         assert(raised);
