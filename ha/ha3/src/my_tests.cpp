@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <functional>
 #define ENABLE
 
 #if defined(ENABLE)
@@ -38,6 +39,13 @@ void ref_bind_tests() {
     auto binder = fn::bind(succ, _1);
     binder(a);
     assert(1 == a);
+
+    auto b3 = std::bind(succ, std::ref(a));
+    b3();
+    assert(2 == a);
+    auto b2 = fn::bind(succ, std::ref(a));
+    b2();
+    assert(3 == a);
 }
 
 void extra_args_tests() {

@@ -54,7 +54,7 @@ namespace fn {
         struct tuple_type_extractor<ARG, false> {
             template<typename ARGUMENT, typename TUPLE>
             auto get(ARGUMENT && arg, TUPLE const& tuple)->ARGUMENT&& {
-                return arg;
+                return std::forward<ARGUMENT>(arg);
             }
         };
 
