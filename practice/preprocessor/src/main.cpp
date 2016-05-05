@@ -46,25 +46,27 @@ void exec_instrs(const std::vector<unsigned char> &instrs)
 int main()
 {
     std::srand(std::time(0));
-
+    using ::LOG_LEVELS;
     // Part 1
     bool assertion1_evaluated = false;
     myassert(assertion1_evaluated = true);
     assert((CONFIG_DEBUG && assertion1_evaluated)
             || (!CONFIG_DEBUG && !assertion1_evaluated));
 
+    //myassert(1 == 4);
+
     // Part 2
-    LOG(INFO, "==============================");
-    LOG(DEBUG, "%d %d %d %s", 1, 2, 3, "debug");
-    LOG(INFO, "%d %d %s", 1, 2, "info");
-    LOG(WARN, "%d %s", 1, "warning");
-    LOG(ERROR, "%s", "error!");
+    LOG(LOG_LEVELS::INFO, "==============================");
+    LOG(LOG_LEVELS::DEBUG, "%d %d %d %s", 1, 2, 3, "debug");
+    LOG(LOG_LEVELS::INFO, "%d %d %s", 1, 2, "info");
+    LOG(LOG_LEVELS::WARN, "%d %s", 1, "warning");
+    LOG(LOG_LEVELS::ERROR, "%s", "error!");
 
     // Part 3
-    LOG(INFO, "==============================");
-    LOG(INFO, "%s %s", instruction_name(INST_DADD),
+    LOG(LOG_LEVELS::INFO, "==============================");
+    LOG(LOG_LEVELS::INFO, "%s %s", instruction_name(INST_DADD),
             instruction_description(INST_DADD));
-    LOG(INFO, "%s %s", instruction_name(INST_IPRINT),
+    LOG(LOG_LEVELS::INFO, "%s %s", instruction_name(INST_IPRINT),
             instruction_description(INST_IPRINT));
 
     // Part 4
@@ -72,7 +74,7 @@ int main()
     log_instrs(inst_stream);
 
     // Part 5
-    LOG(INFO, "==============================");
+    LOG(LOG_LEVELS::INFO, "==============================");
     std::vector<unsigned char> super_code = {
         INST_ILOAD, 0xff, 0, 0, 0, 0, 0, 0, 0,
         INST_ILOAD, 0, 0, 0xdd, 0, 0, 0, 0, 0,
