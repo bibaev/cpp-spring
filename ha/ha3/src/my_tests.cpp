@@ -41,9 +41,11 @@ void ref_bind_tests() {
     assert(1 == a);
 
     auto b3 = std::bind(succ, std::ref(a));
+    // auto b3 = std::bind(succ, a);
     b3();
     assert(2 == a);
     auto b2 = fn::bind(succ, std::ref(a));
+    // auto b2 = fn::bind(succ, a);
     b2();
     assert(3 == a);
 }
@@ -115,6 +117,47 @@ void move_binder() {
     // assert(10 != b3());
 }
 
+int fun(int&& value) {
+    return 65;
+}
+
+struct test_struct {
+    test_struct()
+        : copy_count(0){ };
+
+    test_struct(test_struct const& other) {
+        copy_count = other.copy_count + 1;
+    }
+
+    test_struct(test_struct&& other) {
+        std::swap(copy_count, other.copy_count);
+    }
+
+    size_t get_copy_count() const {
+        return copy_count;
+    }
+
+private:
+    size_t copy_count;
+};
+
+test_struct copy_struct_fun(test_struct val) {
+    return val;
+}
+
+void move_struct_tests() {
+    test_struct a;
+
+    auto b = bind(copy_struct_fun, _1)(std::move(a));
+    assert(0 == b.get_copy_count());
+}
+
+void r_value_ref_tests() {
+    int a = 10;
+    auto binder = fn::bind(fun, _1);
+    binder(std::move(a));
+}
+
 void lambda_tests() {
     assert(6 == bind([](int a, int b, int c) ->int { return a + b + c; }, 1, _1, _2)(1, 4));
 }
@@ -132,17 +175,20 @@ void fun_ref_change_tests() {
     assert(2 == a);
 }
 
+
 int my_testt_start() {
     // bind tests
     bind_1_test();
     functor_tests();
     lambda_tests();
     ref_bind_tests();
+    r_value_ref_tests();
     extra_args_tests();
     one_two_arg_tests();
     cp_binder();
     assign_binder();
     move_binder();
+    move_struct_tests();
 
     // function tests
     fun_ref_change_tests();

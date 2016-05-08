@@ -43,9 +43,10 @@ namespace fn {
         // placehodler specialization
         template<typename ARG>
         struct tuple_type_extractor<ARG, true> {
-            template<typename TUPLE, size_t INDEX = (is_placeholder<ARG>::value - 1)>
-            auto get(ARG const& placeholder, TUPLE & tuple) -> typename std::tuple_element<INDEX, TUPLE>::type& {
-                return std::get<INDEX>(tuple);
+            template<typename TUPLE, size_t INDEX = (is_placeholder<ARG>::value - 1),
+            typename RES = typename std::add_rvalue_reference<typename std::tuple_element<INDEX, TUPLE>::type>::type>
+            auto get(ARG const& placeholder, TUPLE const& tuple) -> RES {
+                return std::forward<RES>(std::get<INDEX>(tuple));
             }
         };
 
@@ -61,8 +62,8 @@ namespace fn {
         template<typename FUN, typename... BINDED_ARGS>
         struct binder<FUN(BINDED_ARGS...)> {
             template<typename... CALL_ARGS>
-            explicit binder(FUN const& function, CALL_ARGS &&... args)
-                : function_(function)
+            explicit binder(FUN&& function, CALL_ARGS&&... args)
+                : function_(std::forward<FUN>(function))
                 , binded_args_(std::forward<CALL_ARGS>(args)...) {
             }
 
@@ -74,6 +75,12 @@ namespace fn {
             binder& operator=(binder const& other) {
                 function_ = other.function_;
                 binded_args_ = other.binded_args_;
+                return *this;
+            }
+
+            binder& operator=(binder&& other) {
+                function_ = std::move(other.function_);
+                binded_args_ = std::move(other.binded_args_);
                 return *this;
             }
 
@@ -96,7 +103,7 @@ namespace fn {
                     .get(std::get<INDICES>(binded_args_), args)...);
             }
 
-            FUN function_;
+            typename std::decay<FUN>::type function_;
             std::tuple<BINDED_ARGS...> binded_args_;
         };
     }
@@ -110,8 +117,8 @@ namespace fn {
     const inner::placeholder<7> _7{};
 
     template<typename FUN, typename... ARGS>
-    auto bind(FUN function, ARGS&& ... args) -> decltype(inner::binder<FUN(typename std::decay<ARGS>::type...)>(function, std::forward<ARGS>(args)...)) {
-        return inner::binder<FUN(typename std::decay<ARGS>::type...)>(function, std::forward<ARGS>(args)...);
+    auto bind(FUN&& function, ARGS&& ... args) -> decltype(inner::binder<FUN(typename std::decay<ARGS>::type...)>(std::forward<FUN>(function), std::forward<ARGS>(args)...)) {
+        return inner::binder<FUN(typename std::decay<ARGS>::type...)>(std::forward<FUN>(function), std::forward<ARGS>(args)...);
     }
 
     // function
