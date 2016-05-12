@@ -1,13 +1,12 @@
+#include "au_allocator.h"
+
 #include <iostream>
 #include <cassert>
 #include <vector>
 #include <array>
 #include <string.h>
 #include <algorithm>
-#include <list>
-#include <iterator>
 
-#include "au_allocator.h"
 
 static void test_constructor_forwarding()
 {

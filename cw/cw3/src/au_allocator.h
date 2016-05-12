@@ -1,6 +1,7 @@
 #include <vector>
 #include <list>
 #include <stdexcept>
+#include <cassert>
 const size_t OS_ALLOC_SIZE = 4096;
 
 struct au_allocator {
