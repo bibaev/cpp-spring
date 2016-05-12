@@ -62,9 +62,14 @@ T* au_allocator::allocate(ARGS&&... args) {
 template <typename T>
 void au_allocator::deallocate(T* const ptr) {
     ptr->~T();
+
     auto order = get_order(sizeof(T));
+
     if(order < order_) {
         free_[order].push_back(reinterpret_cast<void*>(ptr));
+    }
+    else {
+        delete[] reinterpret_cast<char*>(ptr);
     }
 }
 
@@ -78,7 +83,7 @@ inline au_allocator::au_allocator(size_t max_order)
 
 inline au_allocator::~au_allocator() {
     for(auto buffer : buffers_) {
-        delete[] buffer;
+        delete[] reinterpret_cast<char*>(buffer);
     }
 }
 
@@ -99,6 +104,11 @@ inline void* au_allocator::allocate(size_t size) {
 }
 
 inline void au_allocator::deallocate(void* ptr, size_t size) {
-    auto order = get_order(size);
-    free_[order].push_back(ptr);
+    if(size > pow(2, order_)) {
+        delete[] reinterpret_cast<char*>(ptr);
+    }
+    else {
+        auto order = get_order(size);
+        free_[order].push_back(ptr);
+    }
 }
