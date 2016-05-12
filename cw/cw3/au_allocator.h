@@ -48,7 +48,6 @@ private:
     }
 
     size_t order_;
-    size_t max_size_;
     std::vector<void*> buffers_;
     std::vector<std::list<void*>> free_;
 };
@@ -71,10 +70,8 @@ void au_allocator::deallocate(T* const ptr) {
 
 inline au_allocator::au_allocator(size_t max_order) 
     : order_(max_order)
-    , max_size_()
     , free_(max_order) {
-    auto block_size = 1 << max_order;
-    if(block_size > OS_ALLOC_SIZE) {
+    if(pow(2, max_order) > OS_ALLOC_SIZE) {
         throw std::logic_error("2^(max_order-1) > N");
     }
 }
